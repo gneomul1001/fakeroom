@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>가방 - Fake Room</title>
+    <title>가방 - Fake Room (최상위 국가 카테고리 추가 버전)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
@@ -17,6 +17,7 @@
 </head>
 <body class="pb-24">
 
+<!-- 상단 헤더 배너 및 검색 영역 -->
 <header class="gabang-orange text-white p-4 sticky top-0 z-50 shadow-md">
     <div class="max-w-4xl mx-auto flex flex-col gap-3">
         <div class="flex justify-between items-center">
@@ -29,8 +30,9 @@
                 </button>
             </div>
         </div>
+        <!-- 이원화 검색창 -->
         <div class="grid grid-cols-3 gap-2">
-            <input type="text" id="region-search-input" onkeyup="if(event.key === 'Enter') executeSearch()" placeholder="📍 동 이름 검색 (예: 서교동)" class="col-span-1 p-2.5 rounded-lg text-black focus:outline-none text-xs shadow-inner bg-orange-50">
+            <input type="text" id="region-search-input" onkeyup="if(event.key === 'Enter') executeSearch()" placeholder="📍 동/도시 검색 (예: 서교동)" class="col-span-1 p-2.5 rounded-lg text-black focus:outline-none text-xs shadow-inner bg-orange-50">
             <div class="col-span-2 relative">
                 <input type="text" id="general-search-input" onkeyup="if(event.key === 'Enter') executeSearch()" placeholder="아파트, 빌라, 원룸 방 번호나 특징 검색" class="w-full p-2.5 rounded-lg text-black focus:outline-none text-xs shadow-inner">
                 <button onclick="executeSearch()" class="absolute right-3 top-2.5 text-gray-400">🔍</button>
@@ -41,41 +43,55 @@
 
 <main class="max-w-4xl mx-auto p-4">
     
+    <!-- 1. 홈 섹션 (추천 매물) -->
     <section id="home-section">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-black text-gray-800 flex items-center gap-1">🔥 오늘의 추천 매물</h2>
             <button onclick="showAddRoomModal()" class="gabang-orange text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow">+ 신규 매물 등록</button>
         </div>
         <div id="recommended-rooms-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            </div>
+            <!-- 매물 카드 동적 로드 -->
+        </div>
     </section>
 
+    <!-- 2. 세분화된 지역 카테고리 탐색 및 관리 섹션 (4단계 계층형 구조) -->
     <section id="region-section" class="hidden">
         <div class="bg-white p-4 rounded-xl shadow-sm border mb-4 flex flex-col gap-4">
             <div class="flex justify-between items-center border-b pb-2">
-                <h2 class="text-base font-bold text-gray-800 flex items-center gap-1">📍 3단계 계층형 지역 관리</h2>
+                <h2 class="text-base font-bold text-gray-800 flex items-center gap-1">📍 4단계 계층형 지역 관리</h2>
                 <div class="flex gap-1">
                     <button onclick="showAddRegionHierarchyModal()" class="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold shadow-sm">➕ 추가</button>
-                    <button onclick="showEditRegionHierarchyModal()" class="bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold shadow-sm">✏️ 수정</button> <button onclick="showDeleteRegionHierarchyModal()" class="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold shadow-sm">❌ 삭제</button>
+                    <button onclick="showEditRegionHierarchyModal()" class="bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold shadow-sm">✏️ 수정</button>
+                    <button onclick="showDeleteRegionHierarchyModal()" class="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold shadow-sm">❌ 삭제</button>
                 </div>
             </div>
             
+            <!-- 1단계: 국가 선택 -->
             <div>
-                <label class="text-[11px] font-bold text-gray-400 block mb-1">1단계: 시 / 도</label>
+                <label class="text-[11px] font-bold text-gray-400 block mb-1">1단계: 국가 (Country)</label>
+                <div id="country-tags-container" class="flex flex-wrap gap-1.5"></div>
+            </div>
+
+            <!-- 2단계: 시/도 선택 -->
+            <div id="sido-wrapper" class="border-t pt-3 hidden">
+                <label class="text-[11px] font-bold text-gray-400 block mb-1">2단계: 시 / 도</label>
                 <div id="sido-tags-container" class="flex flex-wrap gap-1.5"></div>
             </div>
             
+            <!-- 3단계: 시/군/구 선택 -->
             <div id="sigungu-wrapper" class="border-t pt-3 hidden">
-                <label class="text-[11px] font-bold text-gray-400 block mb-1">2단계: 시 / 군 / 구</label>
+                <label class="text-[11px] font-bold text-gray-400 block mb-1">3단계: 시 / 군 / 구</label>
                 <div id="sigungu-tags-container" class="flex flex-wrap gap-1.5"></div>
             </div>
             
+            <!-- 4단계: 읍/면/동 선택 -->
             <div id="dong-wrapper" class="border-t pt-3 hidden">
-                <label class="text-[11px] font-bold text-gray-400 block mb-1">3단계: 읍 / 면 / 동</label>
+                <label class="text-[11px] font-bold text-gray-400 block mb-1">4단계: 읍 / 면 / 동</label>
                 <div id="dong-tags-container" class="flex flex-wrap gap-1.5"></div>
             </div>
         </div>
 
+        <!-- 해당 지역 매물 리스트 헤더 및 등록 버튼 연동 -->
         <div class="mb-2 flex justify-between items-center bg-gray-100 px-3 py-2 rounded-lg">
             <h3 id="current-region-title" class="text-sm font-bold text-gray-600">지역을 선택해 주세요.</h3>
             <button onclick="showAddRoomModal('region')" class="bg-blue-600 text-white px-2.5 py-1 rounded text-xs font-bold shadow hover:bg-blue-700">이 지역에 매물 올리기 +</button>
@@ -83,6 +99,7 @@
         <div id="region-rooms-container" class="grid gap-4 mt-2"></div>
     </section>
 
+    <!-- 3. 부동산 형태 카테고리 관리 섹션 -->
     <section id="type-section" class="hidden">
         <div class="bg-white p-4 rounded-xl shadow-sm border mb-4">
             <div class="flex justify-between items-center mb-3">
@@ -96,6 +113,7 @@
             <div id="type-tags-container" class="flex flex-wrap gap-2"></div>
         </div>
 
+        <!-- 해당 방 형태 매물 리스트 헤더 및 등록 버튼 연동 -->
         <div class="mb-2 flex justify-between items-center bg-gray-100 px-3 py-2 rounded-lg">
             <h3 id="current-type-title" class="text-sm font-bold text-gray-600">유형을 선택해 주세요.</h3>
             <button onclick="showAddRoomModal('type')" class="bg-blue-600 text-white px-2.5 py-1 rounded text-xs font-bold shadow hover:bg-blue-700">이 형태 매물 올리기 +</button>
@@ -103,6 +121,7 @@
         <div id="type-rooms-container" class="grid gap-4 mt-2"></div>
     </section>
 
+    <!-- 4. 통합 검색 결과 섹션 -->
     <section id="search-section" class="hidden">
         <div class="border-b pb-2 mb-4 flex justify-between items-center">
             <h2 class="text-xl font-black text-gray-800">🔍 매물 검색 결과</h2>
@@ -111,17 +130,21 @@
         <div id="search-rooms-container" class="grid gap-4"></div>
     </section>
 
+    <!-- 5. 보관함 섹션 -->
     <section id="bookmark-section" class="hidden">
         <h2 class="text-xl font-black text-gray-800 mb-4">⭐ 내가 찜한 보관함 매물</h2>
         <div id="bookmark-rooms-container" class="grid gap-4"></div>
     </section>
 
+    <!-- 6. 매물 상세 페이지 섹션 -->
     <section id="room-detail-section" class="hidden">
         <div id="room-detail-content" class="bg-white rounded-xl shadow-md overflow-hidden border">
-            </div>
+            <!-- 동적 가상 데이터 렌더링 -->
+        </div>
     </section>
 </main>
 
+<!-- 하단 고정 글로벌 네비게이션 배너 바 -->
 <nav class="fixed bottom-0 inset-x-0 bg-white border-t shadow-lg z-50">
     <div class="max-w-4xl mx-auto grid grid-cols-5 text-center text-xs font-bold text-gray-500">
         <button onclick="showSection('home-section')" id="nav-home-section" class="py-3 flex flex-col items-center gap-1 gabang-text-orange">
@@ -142,6 +165,7 @@
     </div>
 </nav>
 
+<!-- 공용 모달창 시스템 -->
 <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-[100]">
     <div class="bg-white w-full max-w-md p-6 rounded-xl shadow-2xl">
         <h3 id="modal-title" class="text-lg font-bold mb-4 text-gray-800">정보 입력</h3>
@@ -153,17 +177,28 @@
     </div>
 </div>
 
+<!-- 스크립트 핵심 로직 제어 -->
 <script>
-    // 데이터 스키마 (localStorage 연동 v4)
-    let db = JSON.parse(localStorage.getItem('gabangDB_v4')) || {
+    // ⭐️ [데이터 고도화] 4단계 계층형 지리 정보 스키마 (localStorage 연동 v5)
+    let db = JSON.parse(localStorage.getItem('gabangDB_v5')) || {
         regionHierarchy: {
-            "서울특별시": {
-                "마포구": ["서교동", "망원동", "공덕동"],
-                "강남구": ["역삼동", "삼성동", "신사동"]
+            "대한민국": {
+                "서울특별시": {
+                    "마포구": ["서교동", "망원동"],
+                    "강남구": ["역삼동", "삼성동"]
+                },
+                "부산광역시": {
+                    "해운대구": ["우동", "중동"]
+                }
             },
-            "부산광역시": {
-                "해운대구": ["우동", "중동", "재송동"],
-                "진구": ["부전동", "전포동"]
+            "미국": {
+                "캘리포니아주": {
+                    "로스앤젤레스": ["할리우드", "한인타운"],
+                    "샌프란시스코": ["소마(SoMa)"]
+                },
+                "뉴욕주": {
+                    "맨해튼": ["첼시", "소호"]
+                }
             }
         },
         types: ["원룸", "투룸", "오피스텔", "아파트"],
@@ -172,6 +207,7 @@
             {
                 id: 1,
                 title: "홍대입구역 도보 3분 초역세권 원룸",
+                country: "대한민국",
                 sido: "서울특별시",
                 sigungu: "마포구",
                 dong: "서교동",
@@ -185,21 +221,24 @@
             },
             {
                 id: 2,
-                title: "해운대 오션뷰 랜드마크 아파트 초초매매",
-                sido: "부산광역시",
-                sigungu: "해운대구",
-                dong: "우동",
-                type: "아파트",
+                title: "LA 한인타운 중심가 세련된 로프트 오피스텔",
+                country: "미국",
+                sido: "캘리포니아주",
+                sigungu: "로스앤젤레스",
+                dong: "한인타운",
+                type: "오피스텔",
                 priceType: "매매",
-                deposit: 145000,
+                deposit: 85000, // 만원 단위 (8억 5천)
                 rent: 0,
-                desc: "해운대 백사장 도보 1분 거리. 파노라마 바다 조망권 보장 및 주거 인프라 최상.",
+                desc: "2024년 완공 최신 아키텍처 건물. 루프탑 수영장 및 가드 상시 상주 야간 보안 우수.",
                 img: "",
-                spec: "방 3개 / 욕실 2개 / 112㎡"
+                spec: "방 1개 / 욕실 1개 / 65㎡"
             }
         ]
     };
 
+    // 현재 4단계 선택 상태 추적 변수
+    let currentCountry = "";
     let currentSido = "";
     let currentSigungu = "";
     let currentDong = "";
@@ -210,9 +249,9 @@
         updateBookmarkCount();
     }
 
-    function saveDB() { localStorage.setItem('gabangDB_v4', JSON.stringify(db)); }
+    function saveDB() { localStorage.setItem('gabangDB_v5', JSON.stringify(db)); }
 
-    // 이미지 드래그앤드롭 핸들러
+    // 이미지 파일 드롭 처리기
     function handleImageDrop(e, inputId) {
         e.preventDefault();
         e.currentTarget.classList.remove('drag-over');
@@ -228,7 +267,7 @@
     function onDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
     function onDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
 
-    // 라우터 뷰 체인저
+    // 라우터 제어 허브
     function showSection(id) {
         document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
@@ -246,11 +285,12 @@
     }
 
     function clickRegionNav() {
-        const sidos = Object.keys(db.regionHierarchy);
-        if(!currentSido) {
-            currentSido = sidos[0] || "";
-            currentSigungu = currentSido ? Object.keys(db.regionHierarchy[currentSido])[0] || "" : "";
-            currentDong = (currentSido && currentSigungu) ? db.regionHierarchy[currentSido][currentSigungu][0] || "" : "";
+        const countries = Object.keys(db.regionHierarchy);
+        if(!currentCountry) {
+            currentCountry = countries[0] || "";
+            currentSido = currentCountry ? Object.keys(db.regionHierarchy[currentCountry])[0] || "" : "";
+            currentSigungu = (currentCountry && currentSido) ? Object.keys(db.regionHierarchy[currentCountry][currentSido])[0] || "" : "";
+            currentDong = (currentCountry && currentSido && currentSigungu) ? db.regionHierarchy[currentCountry][currentSido][currentSigungu][0] || "" : "";
         }
         showSection('region-section');
     }
@@ -271,33 +311,68 @@
     }
 
     // ==========================================
-    // 3단계 지역 계층 탭 렌더링 파트
+    // 🌐 [4단계 완전 계층 체인] 지역 탐색 엔진 렌더러
     // ==========================================
+    
+    // 1단계: 국가 렌더링
     function renderRegionStep1() {
-        const sidoContainer = document.getElementById('sido-tags-container');
-        sidoContainer.innerHTML = "";
-        Object.keys(db.regionHierarchy).forEach(sido => {
+        const countryContainer = document.getElementById('country-tags-container');
+        countryContainer.innerHTML = "";
+        Object.keys(db.regionHierarchy).forEach(country => {
             const btn = document.createElement('button');
-            btn.className = `px-2.5 py-1 rounded-md font-bold transition-all ${currentSido === sido ? 'gabang-orange text-white' : 'bg-gray-100 text-gray-600'}`;
-            btn.innerText = sido;
+            btn.className = `px-3 py-1 rounded-md font-bold text-xs transition-all ${currentCountry === country ? 'bg-orange-600 text-white' : 'bg-gray-100 text-gray-600'}`;
+            btn.innerText = `🌐 ${country}`;
             btn.onclick = () => {
-                currentSido = sido;
-                const sigungus = Object.keys(db.regionHierarchy[sido] || {});
-                currentSigungu = sigungus[0] || "";
-                currentDong = currentSigungu ? db.regionHierarchy[sido][currentSigungu][0] || "" : "";
+                currentCountry = country;
+                const sidos = Object.keys(db.regionHierarchy[country] || {});
+                currentSido = sidos[0] || "";
+                currentSigungu = currentSido ? Object.keys(db.regionHierarchy[country][currentSido] || {})[0] || "" : "";
+                currentDong = currentSigungu ? db.regionHierarchy[country][currentSido][currentSigungu][0] || "" : "";
                 renderRegionStep1();
             };
-            sidoContainer.appendChild(btn);
+            countryContainer.appendChild(btn);
         });
         renderRegionStep2();
     }
 
+    // 2단계: 시/도 렌더링
     function renderRegionStep2() {
+        const wrapper = document.getElementById('sido-wrapper');
+        const sidoContainer = document.getElementById('sido-tags-container');
+        sidoContainer.innerHTML = "";
+
+        if (!currentCountry || !db.regionHierarchy[currentCountry] || Object.keys(db.regionHierarchy[currentCountry]).length === 0) {
+            wrapper.classList.add('hidden');
+            document.getElementById('sigungu-wrapper').classList.add('hidden');
+            document.getElementById('dong-wrapper').classList.add('hidden');
+            renderRegionRooms();
+            return;
+        }
+
+        wrapper.classList.remove('hidden');
+        Object.keys(db.regionHierarchy[currentCountry]).forEach(sido => {
+            const btn = document.createElement('button');
+            btn.className = `px-2.5 py-1 rounded-md font-bold text-xs transition-all ${currentSido === sido ? 'gabang-orange text-white' : 'bg-gray-100 text-gray-600'}`;
+            btn.innerText = sido;
+            btn.onclick = () => {
+                currentSido = sido;
+                const sigungus = Object.keys(db.regionHierarchy[currentCountry][sido] || {});
+                currentSigungu = sigungus[0] || "";
+                currentDong = currentSigungu ? db.regionHierarchy[currentCountry][sido][currentSigungu][0] || "" : "";
+                renderRegionStep2();
+            };
+            sidoContainer.appendChild(btn);
+        });
+        renderRegionStep3();
+    }
+
+    // 3단계: 시/군/구 렌더링
+    function renderRegionStep3() {
         const wrapper = document.getElementById('sigungu-wrapper');
         const sigunguContainer = document.getElementById('sigungu-tags-container');
         sigunguContainer.innerHTML = "";
 
-        if (!currentSido || !db.regionHierarchy[currentSido] || Object.keys(db.regionHierarchy[currentSido]).length === 0) {
+        if (!currentSido || !db.regionHierarchy[currentCountry][currentSido] || Object.keys(db.regionHierarchy[currentCountry][currentSido]).length === 0) {
             wrapper.classList.add('hidden');
             document.getElementById('dong-wrapper').classList.add('hidden');
             renderRegionRooms();
@@ -305,37 +380,38 @@
         }
 
         wrapper.classList.remove('hidden');
-        Object.keys(db.regionHierarchy[currentSido]).forEach(sigungu => {
+        Object.keys(db.regionHierarchy[currentCountry][currentSido]).forEach(sigungu => {
             const btn = document.createElement('button');
-            btn.className = `px-2.5 py-1 rounded-md font-bold transition-all ${currentSigungu === sigungu ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-600'}`;
+            btn.className = `px-2.5 py-1 rounded-md font-bold text-xs transition-all ${currentSigungu === sigungu ? 'bg-gray-800 text-white' : 'bg-gray-100 text-gray-600'}`;
             btn.innerText = sigungu;
             btn.onclick = () => {
                 currentSigungu = sigungu;
-                currentDong = db.regionHierarchy[currentSido][sigungu][0] || "";
-                renderRegionStep2();
+                currentDong = db.regionHierarchy[currentCountry][currentSido][sigungu][0] || "";
+                renderRegionStep3();
             };
             sigunguContainer.appendChild(btn);
         });
-        renderRegionStep3();
+        renderRegionStep4();
     }
 
-    function renderRegionStep3() {
+    // 4단계: 읍/면/동 렌더링
+    function renderRegionStep4() {
         const wrapper = document.getElementById('dong-wrapper');
         const dongContainer = document.getElementById('dong-tags-container');
         dongContainer.innerHTML = "";
 
-        if (!currentSigungu || !db.regionHierarchy[currentSido][currentSigungu] || db.regionHierarchy[currentSido][currentSigungu].length === 0) {
+        if (!currentSigungu || !db.regionHierarchy[currentCountry][currentSido][currentSigungu] || db.regionHierarchy[currentCountry][currentSido][currentSigungu].length === 0) {
             wrapper.classList.add('hidden');
             renderRegionRooms();
             return;
         }
 
         wrapper.classList.remove('hidden');
-        db.regionHierarchy[currentSido][currentSigungu].forEach(dong => {
+        db.regionHierarchy[currentCountry][currentSido][currentSigungu].forEach(dong => {
             const btn = document.createElement('button');
-            btn.className = `px-2.5 py-1 rounded-md font-bold transition-all ${currentDong === dong ? 'border-2 border-[#ff6e12] text-[#ff6e12] bg-orange-50' : 'bg-gray-100 text-gray-600'}`;
+            btn.className = `px-2.5 py-1 rounded-md font-bold text-xs transition-all ${currentDong === dong ? 'border-2 border-[#ff6e12] text-[#ff6e12] bg-orange-50' : 'bg-gray-100 text-gray-600'}`;
             btn.innerText = dong;
-            btn.onclick = () => { currentDong = dong; renderRegionStep3(); };
+            btn.onclick = () => { currentDong = dong; renderRegionStep4(); };
             dongContainer.appendChild(btn);
         });
         renderRegionRooms();
@@ -346,104 +422,193 @@
         const container = document.getElementById('region-rooms-container');
         container.innerHTML = "";
 
-        if(!currentSido) {
+        if(!currentCountry) {
             titleEl.innerText = "선택된 지역이 없습니다.";
             return;
         }
 
-        let label = `📍 ${currentSido}`;
+        let label = `🌐 ${currentCountry}`;
+        if(currentSido) label += ` ➡️ ${currentSido}`;
         if(currentSigungu) label += ` ➡️ ${currentSigungu}`;
         if(currentDong) label += ` ➡️ ${currentDong}`;
         titleEl.innerText = label;
 
         const filtered = db.rooms.filter(r => 
-            r.sido === currentSido && 
+            r.country === currentCountry &&
+            (!currentSido || r.sido === currentSido) && 
             (!currentSigungu || r.sigungu === currentSigungu) && 
             (!currentDong || r.dong === currentDong)
         );
 
         if(filtered.length === 0) {
-            container.innerHTML = `<div class='text-center py-12 bg-white border border-dashed rounded-xl text-gray-400 font-bold'>해당 세부 구역에 등록된 방이 없습니다.</div>`;
+            container.innerHTML = `<div class='text-center py-12 bg-white border border-dashed rounded-xl text-gray-400 font-bold text-xs'>해당 구역에 등록된 매물이 없습니다.</div>`;
         } else {
             filtered.forEach(room => container.appendChild(createRoomCard(room)));
         }
     }
 
     // ==========================================
-    // ⭐️ [신규 기능 추가] 계층형 지역 카테고리 명칭 수정 모달 엔진
+    // 🛠️ 4단계 지역 카테고리 추가/수정/삭제 관리 제어 모듈
     // ==========================================
+    
+    function showAddRegionHierarchyModal() {
+        let countryOptions = `<option value="new">+ 직접 국가 신설 추가</option>` + Object.keys(db.regionHierarchy).map(c => `<option value="${c}">${c}</option>`).join('');
+        
+        openModal("🌐 4단계 글로벌 지역 카테고리 추가", `
+            <div class="mb-2">
+                <label class="font-bold text-gray-500 block mb-1">1단계: 국가 선택</label>
+                <select id="modal-add-country-select" onchange="onModalCountryChange()" class="w-full border p-2 rounded bg-white text-xs">${countryOptions}</select>
+                <input id="modal-add-country-input" type="text" placeholder="새 국가명 (예: 일본)" class="w-full border p-2 rounded mt-1 text-xs">
+            </div>
+            <div class="mb-2">
+                <label class="font-bold text-gray-500 block mb-1">2단계: 시/도 입력</label>
+                <input id="modal-add-sido-input" type="text" placeholder="시/도/주 단위 (예: 도쿄도)" class="w-full border p-2 rounded text-xs">
+            </div>
+            <div class="mb-2">
+                <label class="font-bold text-gray-500 block mb-1">3단계: 시/군/구 입력</label>
+                <input id="modal-add-sigungu-input" type="text" placeholder="시/군/구/지방 단위 (예: 신주쿠구)" class="w-full border p-2 rounded text-xs">
+            </div>
+            <div class="mb-2">
+                <label class="font-bold text-gray-500 block mb-1">4단계: 읍/면/동 입력</label>
+                <input id="modal-add-dong-input" type="text" placeholder="최하위 동/구역 단위 (예: 가부키초)" class="w-full border p-2 rounded text-xs">
+            </div>
+        `, () => {
+            const selCountry = document.getElementById('modal-add-country-select').value;
+            let country = selCountry === 'new' ? document.getElementById('modal-add-country-input').value.trim() : selCountry;
+            const sido = document.getElementById('modal-add-sido-input').value.trim();
+            const sigungu = document.getElementById('modal-add-sigungu-input').value.trim();
+            const dong = document.getElementById('modal-add-dong-input').value.trim();
+
+            if(!country || !sido || !sigungu || !dong) return alert("4개 계층 항목을 누락 없이 전부 기입해 주세요.");
+
+            if(!db.regionHierarchy[country]) db.regionHierarchy[country] = {};
+            if(!db.regionHierarchy[country][sido]) db.regionHierarchy[country][sido] = {};
+            if(!db.regionHierarchy[country][sido][sigungu]) db.regionHierarchy[country][sido][sigungu] = [];
+            
+            if(!db.regionHierarchy[country][sido][sigungu].includes(dong)) {
+                db.regionHierarchy[country][sido][sigungu].push(dong);
+            }
+
+            currentCountry = country; currentSido = sido; currentSigungu = sigungu; currentDong = dong;
+            saveDB(); closeModal(); renderRegionStep1();
+        });
+        onModalCountryChange();
+    }
+
+    function onModalCountryChange() {
+        const sel = document.getElementById('modal-add-country-select').value;
+        const input = document.getElementById('modal-add-country-input');
+        if(sel === 'new') input.classList.remove('hidden'); else input.classList.add('hidden');
+    }
+
     function showEditRegionHierarchyModal() {
         let optionsHtml = "";
-        // 유저가 선택 및 탐색하기 쉽도록 1단계, 2단계, 3단계 노드 경로를 쪼개서 셀렉트 옵션으로 컴파일 구성
-        Object.keys(db.regionHierarchy).forEach(sido => {
-            optionsHtml += `<option value="sido|${sido}|-|-" class="font-bold text-orange-600">[1단계 시/도] ${sido}</option>`;
-            Object.keys(db.regionHierarchy[sido]).forEach(sigungu => {
-                optionsHtml += `<option value="sigungu|${sido}|${sigungu}|-">&nbsp;&nbsp;[2단계 시/군/구] ${sido} > ${sigungu}</option>`;
-                db.regionHierarchy[sido][sigungu].forEach(dong => {
-                    optionsHtml += `<option value="dong|${sido}|${sigungu}|${dong}">&nbsp;&nbsp;&nbsp;&nbsp;[3단계 읍/면/동] ${sido} > ${sigungu} > ${dong}</option>`;
+        Object.keys(db.regionHierarchy).forEach(country => {
+            optionsHtml += `<option value="country|${country}|-|-|-" class="font-black text-red-600">[1단계 국가] ${country}</option>`;
+            Object.keys(db.regionHierarchy[country]).forEach(sido => {
+                optionsHtml += `<option value="sido|${country}|${sido}|-|-" class="font-bold text-orange-500">&nbsp;&nbsp;[2단계 시/도] ${country} > ${sido}</option>`;
+                Object.keys(db.regionHierarchy[country][sido]).forEach(sigungu => {
+                    optionsHtml += `<option value="sigungu|${country}|${sido}|${sigungu}|-">&nbsp;&nbsp;&nbsp;&nbsp;[3단계 시/군/구] ${sido} > ${sigungu}</option>`;
+                    db.regionHierarchy[country][sido][sigungu].forEach(dong => {
+                        optionsHtml += `<option value="dong|${country}|${sido}|${sigungu}|${dong}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[4단계 동] ${sigungu} > ${dong}</option>`;
+                    });
                 });
             });
         });
 
-        if(!optionsHtml) return alert("수정 변경을 가할 지리 행정구역 카테고리가 비어있습니다.");
+        if(!optionsHtml) return alert("수정 대상 지리 데이터가 없습니다.");
 
-        openModal("✏️ 계층형 지역 명칭 수정", `
+        openModal("✏️ 4단계 지역 명칭 계층 수정", `
             <div class="mb-3">
-                <label class="font-bold text-gray-500 block mb-1">수정할 카테고리 단계 선택</label>
+                <label class="font-bold text-gray-500 block mb-1">수정 타겟 레이어 노드 선택</label>
                 <select id="modal-edit-region-path" class="w-full border p-2.5 rounded bg-white text-xs">${optionsHtml}</select>
             </div>
             <div>
-                <label class="font-bold text-gray-500 block mb-1">새로운 변경 명칭 입력</label>
-                <input id="modal-edit-region-name" type="text" placeholder="예: 세종특별자치시 / 기장군 / 우동" class="w-full border p-2.5 rounded text-xs">
+                <label class="font-bold text-gray-500 block mb-1">새로운 변경 명칭 지정</label>
+                <input id="modal-edit-region-name" type="text" placeholder="변경할 텍스트 입력" class="w-full border p-2.5 rounded text-xs">
             </div>
         `, () => {
             const pathInfo = document.getElementById('modal-edit-region-path').value;
             const newName = document.getElementById('modal-edit-region-name').value.trim();
+            if(!newName) return alert("공백 치환 변경은 불가합니다.");
             
-            if(!newName) return alert("공백 명칭으로 카테고리를 변경할 수 없습니다.");
-            
-            const [level, sido, sigungu, dong] = pathInfo.split('|');
+            const [level, country, sido, sigungu, dong] = pathInfo.split('|');
 
-            if(level === 'sido') {
-                if(db.regionHierarchy[newName]) return alert("이미 대동소이하게 존재하는 동명의 시/도 카테고리가 있습니다.");
-                
-                // 1. 객체 키값 마이그레이션 교체 연동
-                db.regionHierarchy[newName] = db.regionHierarchy[sido];
-                delete db.regionHierarchy[sido];
-                
-                // 2. 소속 소유 매물들의 'sido' 메타데이터 실시간 대치 업데이트 처리
-                db.rooms.forEach(r => { if(r.sido === sido) r.sido = newName; });
+            if(level === 'country') {
+                if(db.regionHierarchy[newName]) return alert("이미 동명의 국가 카테고리가 개설되어 있습니다.");
+                db.regionHierarchy[newName] = db.regionHierarchy[country];
+                delete db.regionHierarchy[country];
+                db.rooms.forEach(r => { if(r.country === country) r.country = newName; });
+                currentCountry = newName;
+            } 
+            else if(level === 'sido') {
+                if(db.regionHierarchy[country][newName]) return alert("해당 국가 내에 이미 동일한 시/도 분류가 있습니다.");
+                db.regionHierarchy[country][newName] = db.regionHierarchy[country][sido];
+                delete db.regionHierarchy[country][sido];
+                db.rooms.forEach(r => { if(r.country === country && r.sido === sido) r.sido = newName; });
                 currentSido = newName;
-
-            } else if(level === 'sigungu') {
-                if(db.regionHierarchy[sido][newName]) return alert("해당 시/도 내부 노드에 이미 동일한 시/군/구가 배치되어 있습니다.");
-                
-                db.regionHierarchy[sido][newName] = db.regionHierarchy[sido][sigungu];
-                delete db.regionHierarchy[sido][sigungu];
-                
-                db.rooms.forEach(r => { if(r.sido === sido && r.sigungu === sigungu) r.sigungu = newName; });
+            } 
+            else if(level === 'sigungu') {
+                if(db.regionHierarchy[country][sido][newName]) return alert("해당 상위 지역 내에 이미 동일한 시/군/구가 배치되어 있습니다.");
+                db.regionHierarchy[country][sido][newName] = db.regionHierarchy[country][sido][sigungu];
+                delete db.regionHierarchy[country][sido][sigungu];
+                db.rooms.forEach(r => { if(r.country === country && r.sido === sido && r.sigungu === sigungu) r.sigungu = newName; });
                 currentSigungu = newName;
-
-            } else if(level === 'dong') {
-                const dongArray = db.regionHierarchy[sido][sigungu];
-                if(dongArray.includes(newName)) return alert("해당 구역 내에 이미 존재하는 동일한 동 명칭 분류입니다.");
-                
-                const idx = dongArray.indexOf(dong);
-                if(idx > -1) {
-                    dongArray[idx] = newName;
-                }
-                
-                db.rooms.forEach(r => { if(r.sido === sido && r.sigungu === sigungu && r.dong === dong) r.dong = newName; });
+            } 
+            else if(level === 'dong') {
+                const dongArr = db.regionHierarchy[country][sido][sigungu];
+                if(dongArr.includes(newName)) return alert("이미 해당 구역 내에 동일 동 분류 명칭이 존재합니다.");
+                const idx = dongArr.indexOf(dong);
+                if(idx > -1) dongArr[idx] = newName;
+                db.rooms.forEach(r => { if(r.country === country && r.sido === sido && r.sigungu === sigungu && r.dong === dong) r.dong = newName; });
                 currentDong = newName;
             }
 
-            saveDB();
-            closeModal();
-            renderRegionStep1();
+            saveDB(); closeModal(); renderRegionStep1();
         });
     }
 
-    // 방 형태별 카테고리 뷰 레이아웃
+    function showDeleteRegionHierarchyModal() {
+        let optionsHtml = "";
+        Object.keys(db.regionHierarchy).forEach(country => {
+            Object.keys(db.regionHierarchy[country]).forEach(sido => {
+                Object.keys(db.regionHierarchy[country][sido]).forEach(sigungu => {
+                    db.regionHierarchy[country][sido][sigungu].forEach(dong => {
+                        optionsHtml += `<option value="${country}|${sido}|${sigungu}|${dong}">${country} > ${sido} > ${sigungu} > ${dong}</option>`;
+                    });
+                });
+            });
+        });
+
+        if(!optionsHtml) return alert("삭제 처리할 카테고리 데이터 항목이 없습니다.");
+
+        openModal("❌ 4단계 계층형 지역 카테고리 삭제", `
+            <p class="text-[10px] text-red-500 font-bold mb-2">* 최하위 동 노드가 매핑 해제되며 소속 매물들은 연동 주소가 비활성 유실될 수 있습니다.</p>
+            <select id="modal-delete-region-path" class="w-full border p-2.5 rounded bg-white text-xs">${optionsHtml}</select>
+        `, () => {
+            const path = document.getElementById('modal-delete-region-path').value;
+            const [country, sido, sigungu, dong] = path.split('|');
+
+            if(confirm(`[${country} > ${sido} > ${sigungu} > ${dong}] 지리 데이터를 연동 리스트에서 파괴 배제하시겠습니까?`)) {
+                db.regionHierarchy[country][sido][sigungu] = db.regionHierarchy[country][sido][sigungu].filter(d => d !== dong);
+                
+                if(db.regionHierarchy[country][sido][sigungu].length === 0) delete db.regionHierarchy[country][sido][sigungu];
+                if(Object.keys(db.regionHierarchy[country][sido]).length === 0) delete db.regionHierarchy[country][sido];
+                if(Object.keys(db.regionHierarchy[country]).length === 0) delete db.regionHierarchy[country];
+
+                const remCountries = Object.keys(db.regionHierarchy);
+                currentCountry = remCountries[0] || "";
+                currentSido = currentCountry ? Object.keys(db.regionHierarchy[currentCountry])[0] || "" : "";
+                currentSigungu = (currentCountry && currentSido) ? Object.keys(db.regionHierarchy[currentCountry][currentSido])[0] || "" : "";
+                currentDong = (currentCountry && currentSido && currentSigungu) ? db.regionHierarchy[currentCountry][currentSido][currentSigungu][0] || "" : "";
+
+                saveDB();
+            }
+            closeModal(); renderRegionStep1();
+        });
+    }
+
+    // 부동산 형태 카테고리 탭 레이아웃
     function renderTypeTabs() {
         const tagBox = document.getElementById('type-tags-container');
         tagBox.innerHTML = "";
@@ -455,15 +620,13 @@
             tagBox.appendChild(btn);
         });
 
-        const titleEl = document.getElementById('current-type-title');
-        titleEl.innerText = `🏢 선택된 방 형태: [ ${selectedTypeFilter} ]`;
-
+        document.getElementById('current-type-title').innerText = `🏢 선택된 방 형태: [ ${selectedTypeFilter} ]`;
         const listContainer = document.getElementById('type-rooms-container');
         listContainer.innerHTML = "";
         const filtered = db.rooms.filter(r => r.type === selectedTypeFilter);
 
         if(filtered.length === 0) {
-            listContainer.innerHTML = `<div class='text-center py-10 bg-white border border-dashed rounded-xl text-gray-400 font-bold'>해당 유형의 방이 존재하지 않습니다.</div>`;
+            listContainer.innerHTML = `<div class='text-center py-10 bg-white border border-dashed rounded-xl text-gray-400 font-bold text-xs'>해당 유형의 방이 존재하지 않습니다.</div>`;
         } else {
             filtered.forEach(room => listContainer.appendChild(createRoomCard(room)));
         }
@@ -486,7 +649,7 @@
         container.innerHTML = "";
 
         let results = db.rooms;
-        if (regQuery) results = results.filter(r => r.dong.includes(regQuery) || r.sigungu.includes(regQuery) || r.sido.includes(regQuery));
+        if (regQuery) results = results.filter(r => r.dong.includes(regQuery) || r.sigungu.includes(regQuery) || r.sido.includes(regQuery) || r.country.includes(regQuery));
         if (genQuery) results = results.filter(r => r.title.includes(genQuery) || r.desc.includes(genQuery) || r.type.includes(genQuery) || r.priceType.includes(genQuery));
 
         document.getElementById('search-count').innerText = `${results.length}개의 매물`;
@@ -494,14 +657,11 @@
         else results.forEach(room => container.appendChild(createRoomCard(room)));
     }
 
-    // 매물 전용 공용 컴포넌트 카드 UI
     function createRoomCard(room) {
         const div = document.createElement('div');
         div.className = `bg-white border rounded-xl shadow-sm overflow-hidden flex flex-col cursor-pointer hover:shadow-md transition-shadow relative`;
         
-        const imgHtml = room.img 
-            ? `<img src="${room.img}" class="w-full h-44 object-cover">`
-            : `<div class="w-full h-44 bg-gray-100 flex flex-col items-center justify-center text-gray-400 text-xs">🏠 등록된 이미지 없음</div>`;
+        const imgHtml = room.img ? `<img src="${room.img}" class="w-full h-44 object-cover">` : `<div class="w-full h-44 bg-gray-100 flex flex-col items-center justify-center text-gray-400 text-xs">🏠 사진 없음</div>`;
 
         let priceText = "";
         if (room.priceType === "매매") priceText = `<span class="text-red-600">매매</span> ${(room.deposit).toLocaleString()}만원`;
@@ -515,7 +675,7 @@
                 ${imgHtml}
                 <div class="p-4">
                     <p class="text-lg font-black text-gray-900 mb-1">${priceText}</p>
-                    <p class="text-[11px] font-bold text-gray-400 mb-1">${room.type} · ${room.sido} ${room.sigungu} ${room.dong}</p>
+                    <p class="text-[10px] font-bold text-gray-400 mb-1">${room.type} · 🌐 ${room.country} ${room.sido} ${room.sigungu} ${room.dong}</p>
                     <h3 class="text-sm font-bold text-gray-700 truncate">${room.title}</h3>
                     <p class="text-xs text-gray-400 mt-1 truncate">${room.desc}</p>
                 </div>
@@ -532,26 +692,29 @@
     function toggleBookmark(e, id) {
         e.stopPropagation();
         const index = db.bookmarks.indexOf(id);
-        if (index > -1) db.bookmarks.splice(index, 1);
-        else db.bookmarks.push(id);
+        if (index > -1) db.bookmarks.splice(index, 1); else db.bookmarks.push(id);
         saveDB(); updateBookmarkCount();
         showSection(document.querySelector('main > section:not(.hidden)').id);
     }
     function updateBookmarkCount() { document.getElementById('bookmark-count').innerText = db.bookmarks.length; }
 
+    // ==========================================
+    // ⭐️ [4단계 연동 구현] 매물 등록/수정 모달 필드 처리 파트
+    // ==========================================
     function showAddRoomModal(context = 'general') {
-        let sidoOptions = Object.keys(db.regionHierarchy).map(s => `<option value="${s}">${s}</option>`).join('');
-        let defaultSido = context === 'region' ? currentSido : Object.keys(db.regionHierarchy)[0];
+        let countryOptions = Object.keys(db.regionHierarchy).map(c => `<option value="${c}">${c}</option>`).join('');
+        let defaultCountry = context === 'region' ? currentCountry : Object.keys(db.regionHierarchy)[0];
         let defaultType = context === 'type' ? selectedTypeFilter : db.types[0];
 
-        openModal("🏠 계층형 주소 연동 매물 신규 등록", `
+        openModal("🏠 4단계 글로벌 주소 연동 매물 신규 등록", `
             <input id="add-title" type="text" placeholder="매물 정보 타이틀" class="w-full border p-2.5 rounded text-xs mb-1">
             <div class="bg-gray-50 p-2 rounded-lg mb-1 flex flex-col gap-1 border">
-                <p class="text-[10px] text-gray-400 font-bold">📍 행정 주소 연동 (계층 선택)</p>
-                <div class="grid grid-cols-3 gap-1">
-                    <select id="add-room-sido" onchange="onAddRoomSidoChange()" class="border p-1.5 rounded text-xs bg-white">${sidoOptions}</select>
-                    <select id="add-room-sigungu" onchange="onAddRoomSigunguChange()" class="border p-1.5 rounded text-xs bg-white"></select>
-                    <select id="add-room-dong" class="border p-1.5 rounded text-xs bg-white"></select>
+                <p class="text-[10px] text-gray-400 font-bold">📍 행정 주소 글로벌 연동 (4단계 연쇄 선택)</p>
+                <div class="grid grid-cols-4 gap-1">
+                    <select id="add-room-country" onchange="onAddRoomCountryChange()" class="border p-1 rounded text-[11px] bg-white">${countryOptions}</select>
+                    <select id="add-room-sido" onchange="onAddRoomSidoChange()" class="border p-1 rounded text-[11px] bg-white"></select>
+                    <select id="add-room-sigungu" onchange="onAddRoomSigunguChange()" class="border p-1 rounded text-[11px] bg-white"></select>
+                    <select id="add-room-dong" class="border p-1 rounded text-[11px] bg-white"></select>
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-2 mb-1">
@@ -583,10 +746,10 @@
             <input id="add-spec" type="text" placeholder="구조 및 크기 (예: 방 1개 / 23㎡)" class="w-full border p-2.5 rounded text-xs mb-1">
             <textarea id="add-desc" placeholder="상세 매물 특징 정보 설명 기술" class="w-full border p-2.5 rounded text-xs h-16 resize-none mb-1"></textarea>
             <input id="add-img" type="text" placeholder="이미지 URL 주소 입력 또는 이미지 파일 드래그앤드롭" 
-                class="w-full border p-2.5 rounded text-xs bg-gray-50 focus:bg-white transition-colors"
-                ondrop="handleImageDrop(event, 'add-img')" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)">
+                class="w-full border p-2.5 rounded text-xs bg-gray-50" ondrop="handleImageDrop(event, 'add-img')" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)">
         `, () => {
             const title = document.getElementById('add-title').value.trim();
+            const country = document.getElementById('add-room-country').value;
             const sido = document.getElementById('add-room-sido').value;
             const sigungu = document.getElementById('add-room-sigungu').value;
             const dong = document.getElementById('add-room-dong').value;
@@ -598,45 +761,39 @@
             const desc = document.getElementById('add-desc').value.trim();
             const img = document.getElementById('add-img').value;
 
-            if(!title || !sido || !sigungu || !dong) return alert("필수 정보를 입력해주세요.");
+            if(!title || !country || !sido || !sigungu || !dong) return alert("필수 정보를 입력해주세요.");
 
-            db.rooms.push({ id: Date.now(), title, sido, sigungu, dong, type, priceType, deposit, rent, spec, desc, img });
+            db.rooms.push({ id: Date.now(), title, country, sido, sigungu, dong, type, priceType, deposit, rent, spec, desc, img });
             saveDB(); closeModal();
-            
-            if(context === 'region') { renderRegionStep1(); } 
-            else if(context === 'type') { renderTypeTabs(); } 
-            else { showSection('home-section'); }
+            if(context === 'region') renderRegionStep1(); else if(context === 'type') renderTypeTabs(); else showSection('home-section');
         });
 
-        document.getElementById('add-room-sido').value = defaultSido;
-        onAddRoomSidoChange(context === 'region' ? currentSigungu : null, context === 'region' ? currentDong : null);
+        document.getElementById('add-room-country').value = defaultCountry;
+        onAddRoomCountryChange(context === 'region' ? currentSido : null, context === 'region' ? currentSigungu : null, context === 'region' ? currentDong : null);
         document.getElementById('add-type').value = defaultType;
         toggleRentInputVisibility('add');
     }
 
-    function toggleRentInputVisibility(prefix) {
-        const pType = document.getElementById(`${prefix}-priceType`).value;
-        const rentWrapper = document.getElementById(`wrapper-${prefix}-rent`);
-        const depositLabel = document.getElementById(`label-deposit`);
-
-        if(pType === "매매") {
-            if(depositLabel) depositLabel.innerText = "매매가 (만원)";
-            if(rentWrapper) rentWrapper.classList.add('hidden');
-        } else if(pType === "전세") {
-            if(depositLabel) depositLabel.innerText = "전세 보증금 (만원)";
-            if(rentWrapper) rentWrapper.classList.add('hidden');
-        } else {
-            if(depositLabel) depositLabel.innerText = "보증금 (만원)";
-            if(rentWrapper) rentWrapper.classList.remove('hidden');
+    function onAddRoomCountryChange(targetSido = null, targetSigungu = null, targetDong = null) {
+        const country = document.getElementById('add-room-country').value;
+        const sidoSelect = document.getElementById('add-room-sido');
+        sidoSelect.innerHTML = "";
+        if(country && db.regionHierarchy[country]) {
+            Object.keys(db.regionHierarchy[country]).forEach(s => {
+                const sel = targetSido === s ? 'selected' : '';
+                sidoSelect.innerHTML += `<option value="${s}" ${sel}>${s}</option>`;
+            });
         }
+        onAddRoomSidoChange(targetSigungu, targetDong);
     }
 
     function onAddRoomSidoChange(targetSigungu = null, targetDong = null) {
+        const country = document.getElementById('add-room-country').value;
         const sido = document.getElementById('add-room-sido').value;
         const sigunguSelect = document.getElementById('add-room-sigungu');
         sigunguSelect.innerHTML = "";
-        if(sido && db.regionHierarchy[sido]) {
-            Object.keys(db.regionHierarchy[sido]).forEach(sg => {
+        if(country && sido && db.regionHierarchy[country][sido]) {
+            Object.keys(db.regionHierarchy[country][sido]).forEach(sg => {
                 const sel = targetSigungu === sg ? 'selected' : '';
                 sigunguSelect.innerHTML += `<option value="${sg}" ${sel}>${sg}</option>`;
             });
@@ -645,12 +802,13 @@
     }
 
     function onAddRoomSigunguChange(targetDong = null) {
+        const country = document.getElementById('add-room-country').value;
         const sido = document.getElementById('add-room-sido').value;
         const sigungu = document.getElementById('add-room-sigungu').value;
         const dongSelect = document.getElementById('add-room-dong');
         dongSelect.innerHTML = "";
-        if(sido && sigungu && db.regionHierarchy[sido][sigungu]) {
-            db.regionHierarchy[sido][sigungu].forEach(d => {
+        if(country && sido && sigungu && db.regionHierarchy[country][sido][sigungu]) {
+            db.regionHierarchy[country][sido][sigungu].forEach(d => {
                 const sel = targetDong === d ? 'selected' : '';
                 dongSelect.innerHTML += `<option value="${d}" ${sel}>${d}</option>`;
             });
@@ -660,16 +818,17 @@
     function showEditRoomModal(e, id) {
         e.stopPropagation();
         const room = db.rooms.find(r => r.id === id);
-        let sidoOptions = Object.keys(db.regionHierarchy).map(s => `<option value="${s}" ${room.sido === s ? 'selected':''}>${s}</option>`).join('');
+        let countryOptions = Object.keys(db.regionHierarchy).map(c => `<option value="${c}" ${room.country === c ? 'selected':''}>${c}</option>`).join('');
 
         openModal("✏️ 매물 제원 정보 수정", `
             <input id="edit-title" type="text" value="${room.title}" class="w-full border p-2.5 rounded text-xs mb-1">
             <div class="bg-gray-50 p-2 rounded-lg mb-1 flex flex-col gap-1 border">
-                <p class="text-[10px] text-blue-500 font-bold">📍 행정 주소 교체 연동</p>
-                <div class="grid grid-cols-3 gap-1">
-                    <select id="edit-room-sido" onchange="onEditRoomSidoChange()" class="border p-1.5 rounded text-xs bg-white">${sidoOptions}</select>
-                    <select id="edit-room-sigungu" onchange="onEditRoomSigunguChange()" class="border p-1.5 rounded text-xs bg-white"></select>
-                    <select id="edit-room-dong" class="border p-1.5 rounded text-xs bg-white"></select>
+                <p class="text-[10px] text-blue-500 font-bold">📍 글로벌 행정 주소 교체 연동</p>
+                <div class="grid grid-cols-4 gap-1">
+                    <select id="edit-room-country" onchange="onEditRoomCountryChange()" class="border p-1 rounded text-[11px] bg-white">${countryOptions}</select>
+                    <select id="edit-room-sido" onchange="onEditRoomSidoChange()" class="border p-1 rounded text-[11px] bg-white"></select>
+                    <select id="edit-room-sigungu" onchange="onEditRoomSigunguChange()" class="border p-1 rounded text-[11px] bg-white"></select>
+                    <select id="edit-room-dong" class="border p-1 rounded text-[11px] bg-white"></select>
                 </div>
             </div>
             <div class="grid grid-cols-2 gap-2 mb-1">
@@ -704,6 +863,7 @@
                 ondrop="handleImageDrop(event, 'edit-img')" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)">
         `, () => {
             room.title = document.getElementById('edit-title').value.trim();
+            room.country = document.getElementById('edit-room-country').value;
             room.sido = document.getElementById('edit-room-sido').value;
             room.sigungu = document.getElementById('edit-room-sigungu').value;
             room.dong = document.getElementById('edit-room-dong').value;
@@ -718,16 +878,30 @@
             saveDB(); closeModal();
             showSection(document.querySelector('main > section:not(.hidden)').id);
         });
-        onEditRoomSidoChange(room.sigungu, room.dong);
+        onEditRoomCountryChange(room.sido, room.sigungu, room.dong);
         toggleRentInputVisibility('edit');
     }
 
+    function onEditRoomCountryChange(targetSido = null, targetSigungu = null, targetDong = null) {
+        const country = document.getElementById('edit-room-country').value;
+        const sidoSelect = document.getElementById('edit-room-sido');
+        sidoSelect.innerHTML = "";
+        if(country && db.regionHierarchy[country]) {
+            Object.keys(db.regionHierarchy[country]).forEach(s => {
+                const sel = targetSido === s ? 'selected' : '';
+                sidoSelect.innerHTML += `<option value="${s}" ${sel}>${s}</option>`;
+            });
+        }
+        onEditRoomSidoChange(targetSigungu, targetDong);
+    }
+
     function onEditRoomSidoChange(targetSigungu = null, targetDong = null) {
+        const country = document.getElementById('edit-room-country').value;
         const sido = document.getElementById('edit-room-sido').value;
         const sigunguSelect = document.getElementById('edit-room-sigungu');
         sigunguSelect.innerHTML = "";
-        if(sido && db.regionHierarchy[sido]) {
-            Object.keys(db.regionHierarchy[sido]).forEach(sg => {
+        if(country && sido && db.regionHierarchy[country][sido]) {
+            Object.keys(db.regionHierarchy[country][sido]).forEach(sg => {
                 const sel = targetSigungu === sg ? 'selected' : '';
                 sigunguSelect.innerHTML += `<option value="${sg}" ${sel}>${sg}</option>`;
             });
@@ -736,15 +910,32 @@
     }
 
     function onEditRoomSigunguChange(targetDong = null) {
+        const country = document.getElementById('edit-room-country').value;
         const sido = document.getElementById('edit-room-sido').value;
         const sigungu = document.getElementById('edit-room-sigungu').value;
         const dongSelect = document.getElementById('edit-room-dong');
         dongSelect.innerHTML = "";
-        if(sido && sigungu && db.regionHierarchy[sido][sigungu]) {
-            db.regionHierarchy[sido][sigungu].forEach(d => {
+        if(country && sido && sigungu && db.regionHierarchy[country][sido][sigungu]) {
+            db.regionHierarchy[country][sido][sigungu].forEach(d => {
                 const sel = targetDong === d ? 'selected' : '';
                 dongSelect.innerHTML += `<option value="${d}" ${sel}>${d}</option>`;
             });
+        }
+    }
+
+    function toggleRentInputVisibility(prefix) {
+        const pType = document.getElementById(`${prefix}-priceType`).value;
+        const rentWrapper = document.getElementById(`wrapper-${prefix}-rent`);
+        const depositLabel = document.getElementById(`label-deposit`);
+        if(pType === "매매") {
+            if(depositLabel) depositLabel.innerText = "매매가 (만원)";
+            if(rentWrapper) rentWrapper.classList.add('hidden');
+        } else if(pType === "전세") {
+            if(depositLabel) depositLabel.innerText = "전세 보증금 (만원)";
+            if(rentWrapper) rentWrapper.classList.add('hidden');
+        } else {
+            if(depositLabel) depositLabel.innerText = "보증금 (만원)";
+            if(rentWrapper) rentWrapper.classList.remove('hidden');
         }
     }
 
@@ -758,7 +949,6 @@
         }
     }
 
-    // 매물 가짜 계약 시스템 시뮬레이터 상세 조회
     function showRoomDetail(id) {
         showSection('room-detail-section');
         const room = db.rooms.find(r => r.id === id);
@@ -776,14 +966,14 @@
             <div class="p-6">
                 <span class="bg-orange-100 text-[#ff6e12] text-xs font-bold px-2.5 py-1 rounded-md">${room.type}</span>
                 <h2 class="text-2xl font-black text-gray-950 mt-2 mb-1">${priceText}</h2>
-                <p class="text-sm font-bold text-gray-700 mb-4">📍 ${room.sido} ${room.sigungu} ${room.dong} · ${room.spec}</p>
+                <p class="text-sm font-bold text-gray-700 mb-4">📍 ${room.country} ${room.sido} ${room.sigungu} ${room.dong} · ${room.spec}</p>
                 <div class="border-t border-b py-4 my-4">
                     <h4 class="text-sm font-bold text-gray-800 mb-2">매물 설명 정보</h4>
                     <p class="text-xs text-gray-600 leading-relaxed">${room.desc || "상세 기술 명세가 등록되지 않은 매물입니다."}</p>
                 </div>
                 <div class="bg-red-50 p-4 rounded-xl border border-red-200 flex flex-col gap-2">
                     <p class="text-xs font-bold text-red-600 flex items-center gap-1">⚠️ [계약 주의사항 안내 고지]</p>
-                    <p class="text-[11px] text-gray-500 leading-tight">본 플랫폼은 <b>실제 계약 서비스 처리가 제공되지 않는 모의 가상 중개 중개 플랫폼</b>입니다. 전자계약 체결을 진행하더라도 대금 결제 및 효력이 발생하지 않습니다.</p>
+                    <p class="text-[11px] text-gray-500 leading-tight">본 플랫폼은 <b>실제 계약 서비스 처리가 제공되지 않는 모의 가상 중개 플랫폼</b>입니다. 전자계약 체결을 진행하더라도 대금 결제 및 효력이 발생하지 않습니다.</p>
                     <button onclick="triggerFakeContractSimulation('${room.title}')" class="w-full mt-2 py-3 bg-gray-900 text-white rounded-lg font-black text-xs shadow hover:bg-black transition-colors">📄 실시간 비대면 온라인 안전 전자계약 진행해보기</button>
                 </div>
             </div>
@@ -805,8 +995,8 @@
         cfBtn.disabled = true; cfBtn.classList.add('opacity-40');
 
         const steps = [
-            { p: 40, text: "🔒 국토교통부 가상 네트워크 부동산 전자계약 원장 매핑 중...", icon: "📡" },
-            { p: 70, text: "🔑 위조 방지 가상 블록체인 타임스탬프 서명 날인 검증 중...", icon: "🔐" },
+            { p: 40, text: "🔒 가상 인터내셔널 글로벌 주택 전산망 원장 조회 중...", icon: "📡" },
+            { p: 70, text: "🔑 위조 방지 가상 블록체인 타임스탬프 글로벌 공증 서명 검증 중...", icon: "🔐" },
             { p: 100, text: "❌ 계약 체결 불가능 거부 실패 처리 알림", icon: "⚠️" }
         ];
 
@@ -820,7 +1010,7 @@
                     clearInterval(interval);
                     document.getElementById('contract-status').innerHTML = `
                         <span class="text-red-600 font-black text-base">최종 체결 거부 실패</span><br>
-                        <p class="text-[11px] text-gray-500 mt-2 font-normal">이 플랫폼은 가짜 부동산 중개 중개 시뮬레이터이므로 계약 서명이 차단됩니다.</p>
+                        <p class="text-[11px] text-gray-500 mt-2 font-normal">이 플랫폼은 가짜 부동산 중개 시뮬레이터이므로 실제 계약 매칭 서명이 원천 차단됩니다.</p>
                     `;
                     cfBtn.disabled = false; cfBtn.classList.remove('opacity-40'); cfBtn.onclick = closeModal;
                 }
@@ -868,71 +1058,6 @@
                 saveDB();
             }
             closeModal(); renderTypeTabs();
-        });
-    }
-
-    function showAddRegionHierarchyModal() {
-        let sidoOptions = `<option value="new">+ 직접 새로 추가</option>` + Object.keys(db.regionHierarchy).map(s => `<option value="${s}">${s}</option>`).join('');
-        openModal("📍 세분화 지역 카테고리 추가", `
-            <div class="mb-2">
-                <label class="font-bold text-gray-500 block mb-1">1단계: 시/도 선택</label>
-                <select id="modal-add-sido-select" onchange="onModalSidoChange()" class="w-full border p-2 rounded bg-white">${sidoOptions}</select>
-                <input id="modal-add-sido-input" type="text" placeholder="새 시/도 입력 (예: 경기도)" class="w-full border p-2 rounded mt-1">
-            </div>
-            <div class="mb-2">
-                <label class="font-bold text-gray-500 block mb-1">2단계: 시/군/구 입력</label>
-                <input id="modal-add-sigungu-input" type="text" placeholder="시/군/구 입력 (예: 수원시)" class="w-full border p-2 rounded">
-            </div>
-            <div class="mb-2">
-                <label class="font-bold text-gray-500 block mb-1">3단계: 읍/면/동 입력</label>
-                <input id="modal-add-dong-input" type="text" placeholder="읍/면/동 입력 (예: 인계동)" class="w-full border p-2 rounded">
-            </div>
-        `, () => {
-            const selectSido = document.getElementById('modal-add-sido-select').value;
-            let targetSido = selectSido === 'new' ? document.getElementById('modal-add-sido-input').value.trim() : selectSido;
-            const targetSigungu = document.getElementById('modal-add-sigungu-input').value.trim();
-            const targetDong = document.getElementById('modal-add-dong-input').value.trim();
-
-            if(!targetSido || !targetSigungu || !targetDong) return alert("모든 계층 항목을 기입해 주십시오.");
-            if(!db.regionHierarchy[targetSido]) db.regionHierarchy[targetSido] = {};
-            if(!db.regionHierarchy[targetSido][targetSigungu]) db.regionHierarchy[targetSido][targetSigungu] = [];
-            if(!db.regionHierarchy[targetSido][targetSigungu].includes(targetDong)) db.regionHierarchy[targetSido][targetSigungu].push(targetDong);
-
-            currentSido = targetSido; currentSigungu = targetSigungu; currentDong = targetDong;
-            saveDB(); closeModal(); renderRegionStep1();
-        });
-        onModalSidoChange();
-    }
-    function onModalSidoChange() {
-        const sel = document.getElementById('modal-add-sido-select').value;
-        const input = document.getElementById('modal-add-sido-input');
-        if(sel === 'new') input.classList.remove('hidden'); else input.classList.add('hidden');
-    }
-
-    function showDeleteRegionHierarchyModal() {
-        let optionsHtml = "";
-        Object.keys(db.regionHierarchy).forEach(sido => {
-            Object.keys(db.regionHierarchy[sido]).forEach(sigungu => {
-                db.regionHierarchy[sido][sigungu].forEach(dong => {
-                    optionsHtml += `<option value="${sido}|${sigungu}|${dong}">${sido} > ${sigungu} > ${dong}</option>`;
-                });
-            });
-        });
-        if(!optionsHtml) return alert("삭제할 항목이 없습니다.");
-        openModal("❌ 세분화 지역 카테고리 제거", `<select id="modal-delete-region-path" class="w-full border p-2.5 rounded bg-white">${optionsHtml}</select>`, () => {
-            const path = document.getElementById('modal-delete-region-path').value;
-            const [sido, sigungu, dong] = path.split('|');
-            if(confirm(`[${sido} > ${sigungu} > ${dong}] 지리 데이터를 노드에서 제외하시겠습니까?`)) {
-                db.regionHierarchy[sido][sigungu] = db.regionHierarchy[sido][sigungu].filter(d => d !== dong);
-                if(db.regionHierarchy[sido][sigungu].length === 0) delete db.regionHierarchy[sido][sigungu];
-                if(Object.keys(db.regionHierarchy[sido]).length === 0) delete db.regionHierarchy[sido];
-                const remainingSidos = Object.keys(db.regionHierarchy);
-                currentSido = remainingSidos[0] || "";
-                currentSigungu = currentSido ? Object.keys(db.regionHierarchy[currentSido])[0] || "" : "";
-                currentDong = (currentSido && currentSigungu) ? db.regionHierarchy[currentSido][currentSigungu][0] || "" : "";
-                saveDB();
-            }
-            closeModal(); renderRegionStep1();
         });
     }
 
