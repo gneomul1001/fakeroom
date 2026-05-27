@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>가방 - Fake Room (매매 추가 & 카테고리 연동 버전)</title>
+    <title>가방 - Fake Room</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
@@ -17,7 +17,6 @@
 </head>
 <body class="pb-24">
 
-<!-- 상단 헤더 배너 및 검색 영역 -->
 <header class="gabang-orange text-white p-4 sticky top-0 z-50 shadow-md">
     <div class="max-w-4xl mx-auto flex flex-col gap-3">
         <div class="flex justify-between items-center">
@@ -30,7 +29,6 @@
                 </button>
             </div>
         </div>
-        <!-- 이원화 검색창 -->
         <div class="grid grid-cols-3 gap-2">
             <input type="text" id="region-search-input" onkeyup="if(event.key === 'Enter') executeSearch()" placeholder="📍 동 이름 검색 (예: 서교동)" class="col-span-1 p-2.5 rounded-lg text-black focus:outline-none text-xs shadow-inner bg-orange-50">
             <div class="col-span-2 relative">
@@ -43,48 +41,41 @@
 
 <main class="max-w-4xl mx-auto p-4">
     
-    <!-- 1. 홈 섹션 (추천 매물) -->
     <section id="home-section">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-black text-gray-800 flex items-center gap-1">🔥 오늘의 추천 매물</h2>
             <button onclick="showAddRoomModal()" class="gabang-orange text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow">+ 신규 매물 등록</button>
         </div>
         <div id="recommended-rooms-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- 매물 카드 동적 로드 -->
-        </div>
+            </div>
     </section>
 
-    <!-- 2. 세분화된 지역 카테고리 탐색 및 관리 섹션 -->
     <section id="region-section" class="hidden">
         <div class="bg-white p-4 rounded-xl shadow-sm border mb-4 flex flex-col gap-4">
             <div class="flex justify-between items-center border-b pb-2">
                 <h2 class="text-base font-bold text-gray-800 flex items-center gap-1">📍 3단계 계층형 지역 관리</h2>
                 <div class="flex gap-1">
-                    <button onclick="showAddRegionHierarchyModal()" class="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold shadow-sm">➕ 카테고리 추가</button>
-                    <button onclick="showDeleteRegionHierarchyModal()" class="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold shadow-sm">❌ 카테고리 삭제</button>
+                    <button onclick="showAddRegionHierarchyModal()" class="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold shadow-sm">➕ 추가</button>
+                    <button onclick="showEditRegionHierarchyModal()" class="bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold shadow-sm">✏️ 수정</button> <button onclick="showDeleteRegionHierarchyModal()" class="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold shadow-sm">❌ 삭제</button>
                 </div>
             </div>
             
-            <!-- 시/도 선택 -->
             <div>
                 <label class="text-[11px] font-bold text-gray-400 block mb-1">1단계: 시 / 도</label>
                 <div id="sido-tags-container" class="flex flex-wrap gap-1.5"></div>
             </div>
             
-            <!-- 시/군/구 선택 -->
             <div id="sigungu-wrapper" class="border-t pt-3 hidden">
                 <label class="text-[11px] font-bold text-gray-400 block mb-1">2단계: 시 / 군 / 구</label>
                 <div id="sigungu-tags-container" class="flex flex-wrap gap-1.5"></div>
             </div>
             
-            <!-- 읍/면/동 선택 -->
             <div id="dong-wrapper" class="border-t pt-3 hidden">
                 <label class="text-[11px] font-bold text-gray-400 block mb-1">3단계: 읍 / 면 / 동</label>
                 <div id="dong-tags-container" class="flex flex-wrap gap-1.5"></div>
             </div>
         </div>
 
-        <!-- 해당 지역 매물 리스트 헤더 및 등록 버튼 연동 -->
         <div class="mb-2 flex justify-between items-center bg-gray-100 px-3 py-2 rounded-lg">
             <h3 id="current-region-title" class="text-sm font-bold text-gray-600">지역을 선택해 주세요.</h3>
             <button onclick="showAddRoomModal('region')" class="bg-blue-600 text-white px-2.5 py-1 rounded text-xs font-bold shadow hover:bg-blue-700">이 지역에 매물 올리기 +</button>
@@ -92,7 +83,6 @@
         <div id="region-rooms-container" class="grid gap-4 mt-2"></div>
     </section>
 
-    <!-- 3. 부동산 형태 카테고리 관리 섹션 -->
     <section id="type-section" class="hidden">
         <div class="bg-white p-4 rounded-xl shadow-sm border mb-4">
             <div class="flex justify-between items-center mb-3">
@@ -106,7 +96,6 @@
             <div id="type-tags-container" class="flex flex-wrap gap-2"></div>
         </div>
 
-        <!-- 해당 방 형태 매물 리스트 헤더 및 등록 버튼 연동 -->
         <div class="mb-2 flex justify-between items-center bg-gray-100 px-3 py-2 rounded-lg">
             <h3 id="current-type-title" class="text-sm font-bold text-gray-600">유형을 선택해 주세요.</h3>
             <button onclick="showAddRoomModal('type')" class="bg-blue-600 text-white px-2.5 py-1 rounded text-xs font-bold shadow hover:bg-blue-700">이 형태 매물 올리기 +</button>
@@ -114,7 +103,6 @@
         <div id="type-rooms-container" class="grid gap-4 mt-2"></div>
     </section>
 
-    <!-- 4. 통합 검색 결과 섹션 -->
     <section id="search-section" class="hidden">
         <div class="border-b pb-2 mb-4 flex justify-between items-center">
             <h2 class="text-xl font-black text-gray-800">🔍 매물 검색 결과</h2>
@@ -123,21 +111,17 @@
         <div id="search-rooms-container" class="grid gap-4"></div>
     </section>
 
-    <!-- 5. 보관함 섹션 -->
     <section id="bookmark-section" class="hidden">
         <h2 class="text-xl font-black text-gray-800 mb-4">⭐ 내가 찜한 보관함 매물</h2>
         <div id="bookmark-rooms-container" class="grid gap-4"></div>
     </section>
 
-    <!-- 6. 매물 상세 페이지 섹션 -->
     <section id="room-detail-section" class="hidden">
         <div id="room-detail-content" class="bg-white rounded-xl shadow-md overflow-hidden border">
-            <!-- 동적 가상 데이터 렌더링 -->
-        </div>
+            </div>
     </section>
 </main>
 
-<!-- 하단 고정 글로벌 네비게이션 배너 바 -->
 <nav class="fixed bottom-0 inset-x-0 bg-white border-t shadow-lg z-50">
     <div class="max-w-4xl mx-auto grid grid-cols-5 text-center text-xs font-bold text-gray-500">
         <button onclick="showSection('home-section')" id="nav-home-section" class="py-3 flex flex-col items-center gap-1 gabang-text-orange">
@@ -158,7 +142,6 @@
     </div>
 </nav>
 
-<!-- 공용 모달창 시스템 -->
 <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-[100]">
     <div class="bg-white w-full max-w-md p-6 rounded-xl shadow-2xl">
         <h3 id="modal-title" class="text-lg font-bold mb-4 text-gray-800">정보 입력</h3>
@@ -170,10 +153,9 @@
     </div>
 </div>
 
-<!-- 스크립트 핵심 로직 제어 -->
 <script>
-    // 계층형 지리 정보 및 매물 기본 데이터 스키마 정의 (localStorage 연동 v3)
-    let db = JSON.parse(localStorage.getItem('gabangDB_v3')) || {
+    // 데이터 스키마 (localStorage 연동 v4)
+    let db = JSON.parse(localStorage.getItem('gabangDB_v4')) || {
         regionHierarchy: {
             "서울특별시": {
                 "마포구": ["서교동", "망원동", "공덕동"],
@@ -208,8 +190,8 @@
                 sigungu: "해운대구",
                 dong: "우동",
                 type: "아파트",
-                priceType: "매매", // 신규 거래 종류 테스트 케이스 고지
-                deposit: 145000,   // 매매가 단독 기록 필드 대체 연동
+                priceType: "매매",
+                deposit: 145000,
                 rent: 0,
                 desc: "해운대 백사장 도보 1분 거리. 파노라마 바다 조망권 보장 및 주거 인프라 최상.",
                 img: "",
@@ -218,7 +200,6 @@
         ]
     };
 
-    // 현재 선택 필터 추적 인프라
     let currentSido = "";
     let currentSigungu = "";
     let currentDong = "";
@@ -229,9 +210,9 @@
         updateBookmarkCount();
     }
 
-    function saveDB() { localStorage.setItem('gabangDB_v3', JSON.stringify(db)); }
+    function saveDB() { localStorage.setItem('gabangDB_v4', JSON.stringify(db)); }
 
-    // 드래그 앤 드롭 디코딩 핸들러
+    // 이미지 드래그앤드롭 핸들러
     function handleImageDrop(e, inputId) {
         e.preventDefault();
         e.currentTarget.classList.remove('drag-over');
@@ -247,7 +228,7 @@
     function onDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
     function onDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
 
-    // 메인 컨트롤 뷰 포트 라우터
+    // 라우터 뷰 체인저
     function showSection(id) {
         document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
@@ -279,7 +260,6 @@
         showSection('type-section');
     }
 
-    // 메인 홈 화면 렌더링
     function renderHomeRooms() {
         const container = document.getElementById('recommended-rooms-container');
         container.innerHTML = "";
@@ -291,7 +271,7 @@
     }
 
     // ==========================================
-    // 3단계 지역 계층 탭 제어 엔진
+    // 3단계 지역 계층 탭 렌더링 파트
     // ==========================================
     function renderRegionStep1() {
         const sidoContainer = document.getElementById('sido-tags-container');
@@ -390,12 +370,83 @@
     }
 
     // ==========================================
-    // 방 형태별 카테고리 뷰 레이아웃
+    // ⭐️ [신규 기능 추가] 계층형 지역 카테고리 명칭 수정 모달 엔진
     // ==========================================
+    function showEditRegionHierarchyModal() {
+        let optionsHtml = "";
+        // 유저가 선택 및 탐색하기 쉽도록 1단계, 2단계, 3단계 노드 경로를 쪼개서 셀렉트 옵션으로 컴파일 구성
+        Object.keys(db.regionHierarchy).forEach(sido => {
+            optionsHtml += `<option value="sido|${sido}|-|-" class="font-bold text-orange-600">[1단계 시/도] ${sido}</option>`;
+            Object.keys(db.regionHierarchy[sido]).forEach(sigungu => {
+                optionsHtml += `<option value="sigungu|${sido}|${sigungu}|-">&nbsp;&nbsp;[2단계 시/군/구] ${sido} > ${sigungu}</option>`;
+                db.regionHierarchy[sido][sigungu].forEach(dong => {
+                    optionsHtml += `<option value="dong|${sido}|${sigungu}|${dong}">&nbsp;&nbsp;&nbsp;&nbsp;[3단계 읍/면/동] ${sido} > ${sigungu} > ${dong}</option>`;
+                });
+            });
+        });
+
+        if(!optionsHtml) return alert("수정 변경을 가할 지리 행정구역 카테고리가 비어있습니다.");
+
+        openModal("✏️ 계층형 지역 명칭 수정", `
+            <div class="mb-3">
+                <label class="font-bold text-gray-500 block mb-1">수정할 카테고리 단계 선택</label>
+                <select id="modal-edit-region-path" class="w-full border p-2.5 rounded bg-white text-xs">${optionsHtml}</select>
+            </div>
+            <div>
+                <label class="font-bold text-gray-500 block mb-1">새로운 변경 명칭 입력</label>
+                <input id="modal-edit-region-name" type="text" placeholder="예: 세종특별자치시 / 기장군 / 우동" class="w-full border p-2.5 rounded text-xs">
+            </div>
+        `, () => {
+            const pathInfo = document.getElementById('modal-edit-region-path').value;
+            const newName = document.getElementById('modal-edit-region-name').value.trim();
+            
+            if(!newName) return alert("공백 명칭으로 카테고리를 변경할 수 없습니다.");
+            
+            const [level, sido, sigungu, dong] = pathInfo.split('|');
+
+            if(level === 'sido') {
+                if(db.regionHierarchy[newName]) return alert("이미 대동소이하게 존재하는 동명의 시/도 카테고리가 있습니다.");
+                
+                // 1. 객체 키값 마이그레이션 교체 연동
+                db.regionHierarchy[newName] = db.regionHierarchy[sido];
+                delete db.regionHierarchy[sido];
+                
+                // 2. 소속 소유 매물들의 'sido' 메타데이터 실시간 대치 업데이트 처리
+                db.rooms.forEach(r => { if(r.sido === sido) r.sido = newName; });
+                currentSido = newName;
+
+            } else if(level === 'sigungu') {
+                if(db.regionHierarchy[sido][newName]) return alert("해당 시/도 내부 노드에 이미 동일한 시/군/구가 배치되어 있습니다.");
+                
+                db.regionHierarchy[sido][newName] = db.regionHierarchy[sido][sigungu];
+                delete db.regionHierarchy[sido][sigungu];
+                
+                db.rooms.forEach(r => { if(r.sido === sido && r.sigungu === sigungu) r.sigungu = newName; });
+                currentSigungu = newName;
+
+            } else if(level === 'dong') {
+                const dongArray = db.regionHierarchy[sido][sigungu];
+                if(dongArray.includes(newName)) return alert("해당 구역 내에 이미 존재하는 동일한 동 명칭 분류입니다.");
+                
+                const idx = dongArray.indexOf(dong);
+                if(idx > -1) {
+                    dongArray[idx] = newName;
+                }
+                
+                db.rooms.forEach(r => { if(r.sido === sido && r.sigungu === sigungu && r.dong === dong) r.dong = newName; });
+                currentDong = newName;
+            }
+
+            saveDB();
+            closeModal();
+            renderRegionStep1();
+        });
+    }
+
+    // 방 형태별 카테고리 뷰 레이아웃
     function renderTypeTabs() {
         const tagBox = document.getElementById('type-tags-container');
         tagBox.innerHTML = "";
-
         db.types.forEach(t => {
             const btn = document.createElement('button');
             btn.className = `px-3 py-1.5 rounded-full text-xs font-bold transition-all ${selectedTypeFilter === t ? 'gabang-orange text-white' : 'bg-gray-100 text-gray-600'}`;
@@ -418,7 +469,6 @@
         }
     }
 
-    // 보관함 및 검색 엔진 구현 스키마
     function renderBookmarkRooms() {
         const container = document.getElementById('bookmark-rooms-container');
         container.innerHTML = "";
@@ -444,7 +494,7 @@
         else results.forEach(room => container.appendChild(createRoomCard(room)));
     }
 
-    // 매물 리스트 공용 카드 UI 컴파일러
+    // 매물 전용 공용 컴포넌트 카드 UI
     function createRoomCard(room) {
         const div = document.createElement('div');
         div.className = `bg-white border rounded-xl shadow-sm overflow-hidden flex flex-col cursor-pointer hover:shadow-md transition-shadow relative`;
@@ -453,7 +503,6 @@
             ? `<img src="${room.img}" class="w-full h-44 object-cover">`
             : `<div class="w-full h-44 bg-gray-100 flex flex-col items-center justify-center text-gray-400 text-xs">🏠 등록된 이미지 없음</div>`;
 
-        // 매매/전세/월세 다변화 렌더링 스위칭 문맥 적용
         let priceText = "";
         if (room.priceType === "매매") priceText = `<span class="text-red-600">매매</span> ${(room.deposit).toLocaleString()}만원`;
         else if (room.priceType === "전세") priceText = `<span class="text-blue-500">전세</span> ${(room.deposit).toLocaleString()}만원`;
@@ -490,19 +539,13 @@
     }
     function updateBookmarkCount() { document.getElementById('bookmark-count').innerText = db.bookmarks.length; }
 
-    // ==========================================
-    // ⭐️ [고도화 패치] 매물 신규 추가 모달 엔진 (컨텍스트 인지 자동 매핑 룰 바인딩)
-    // ==========================================
     function showAddRoomModal(context = 'general') {
         let sidoOptions = Object.keys(db.regionHierarchy).map(s => `<option value="${s}">${s}</option>`).join('');
-
-        // 각 카테고리 진입 유저 세션별 기본 선택지 사전 정렬 가공
         let defaultSido = context === 'region' ? currentSido : Object.keys(db.regionHierarchy)[0];
         let defaultType = context === 'type' ? selectedTypeFilter : db.types[0];
 
         openModal("🏠 계층형 주소 연동 매물 신규 등록", `
-            <input id="add-title" type="text" placeholder="매물 정보 타이틀 (예: 초역세권 신축급 컨디션)" class="w-full border p-2.5 rounded text-xs mb-1">
-            
+            <input id="add-title" type="text" placeholder="매물 정보 타이틀" class="w-full border p-2.5 rounded text-xs mb-1">
             <div class="bg-gray-50 p-2 rounded-lg mb-1 flex flex-col gap-1 border">
                 <p class="text-[10px] text-gray-400 font-bold">📍 행정 주소 연동 (계층 선택)</p>
                 <div class="grid grid-cols-3 gap-1">
@@ -511,7 +554,6 @@
                     <select id="add-room-dong" class="border p-1.5 rounded text-xs bg-white"></select>
                 </div>
             </div>
-
             <div class="grid grid-cols-2 gap-2 mb-1">
                 <div>
                     <label class="text-[10px] font-bold text-gray-500">방 형태 유형</label>
@@ -524,7 +566,7 @@
                     <select id="add-priceType" onchange="toggleRentInputVisibility('add')" class="w-full border p-2 rounded text-xs bg-white">
                         <option value="월세">월세</option>
                         <option value="전세">전세</option>
-                        <option value="매매">매매</option> <!-- ⭐️ 거래 분류 매매 삽입 -->
+                        <option value="매매">매매</option>
                     </select>
                 </div>
             </div>
@@ -556,25 +598,22 @@
             const desc = document.getElementById('add-desc').value.trim();
             const img = document.getElementById('add-img').value;
 
-            if(!title || !sido || !sigungu || !dong) return alert("필수 주소 연동 노드와 제목을 전부 선언해 주십시오.");
+            if(!title || !sido || !sigungu || !dong) return alert("필수 정보를 입력해주세요.");
 
             db.rooms.push({ id: Date.now(), title, sido, sigungu, dong, type, priceType, deposit, rent, spec, desc, img });
             saveDB(); closeModal();
             
-            // 등록 완료 후 사용자가 방금 보고있던 그 카테고리 세션 화면으로 스마트 포커싱 유지 유도
             if(context === 'region') { renderRegionStep1(); } 
             else if(context === 'type') { renderTypeTabs(); } 
             else { showSection('home-section'); }
         });
 
-        // 콘텍스트 인지형 디폴트 값 맵핑 런타임 수립 연동
         document.getElementById('add-room-sido').value = defaultSido;
         onAddRoomSidoChange(context === 'region' ? currentSigungu : null, context === 'region' ? currentDong : null);
         document.getElementById('add-type').value = defaultType;
         toggleRentInputVisibility('add');
     }
 
-    // 매매/전세일 경우 불필요한 월세 인풋 폼 라벨 동적 제어 토글러
     function toggleRentInputVisibility(prefix) {
         const pType = document.getElementById(`${prefix}-priceType`).value;
         const rentWrapper = document.getElementById(`wrapper-${prefix}-rent`);
@@ -618,7 +657,6 @@
         }
     }
 
-    // 매물 제원 데이터 수정 모달
     function showEditRoomModal(e, id) {
         e.stopPropagation();
         const room = db.rooms.find(r => r.id === id);
@@ -652,7 +690,7 @@
             </div>
             <div class="grid grid-cols-2 gap-2 mb-1">
                 <div>
-                    <label id="label-deposit" class="text-[10px] font-bold text-gray-500">금액액 (만원)</label>
+                    <label id="label-deposit" class="text-[10px] font-bold text-gray-500">금액 (만원)</label>
                     <input id="edit-deposit" type="number" value="${room.deposit}" class="w-full border p-2 rounded text-xs">
                 </div>
                 <div id="wrapper-edit-rent">
@@ -720,7 +758,7 @@
         }
     }
 
-    // 상세 조회 레이아웃 컴파일러
+    // 매물 가짜 계약 시스템 시뮬레이터 상세 조회
     function showRoomDetail(id) {
         showSection('room-detail-section');
         const room = db.rooms.find(r => r.id === id);
@@ -745,7 +783,7 @@
                 </div>
                 <div class="bg-red-50 p-4 rounded-xl border border-red-200 flex flex-col gap-2">
                     <p class="text-xs font-bold text-red-600 flex items-center gap-1">⚠️ [계약 주의사항 안내 고지]</p>
-                    <p class="text-[11px] text-gray-500 leading-tight">본 플랫폼은 <b>실제 계약 서비스 처리가 제공되지 않는 모의 가상 중개 사이트</b>입니다. 전자계약 체결을 진행하더라도 대금 결제 및 계약 효력이 발생하지 않습니다.</p>
+                    <p class="text-[11px] text-gray-500 leading-tight">본 플랫폼은 <b>실제 계약 서비스 처리가 제공되지 않는 모의 가상 중개 중개 플랫폼</b>입니다. 전자계약 체결을 진행하더라도 대금 결제 및 효력이 발생하지 않습니다.</p>
                     <button onclick="triggerFakeContractSimulation('${room.title}')" class="w-full mt-2 py-3 bg-gray-900 text-white rounded-lg font-black text-xs shadow hover:bg-black transition-colors">📄 실시간 비대면 온라인 안전 전자계약 진행해보기</button>
                 </div>
             </div>
@@ -782,7 +820,7 @@
                     clearInterval(interval);
                     document.getElementById('contract-status').innerHTML = `
                         <span class="text-red-600 font-black text-base">최종 체결 거부 실패</span><br>
-                        <p class="text-[11px] text-gray-500 mt-2 font-normal">이 플랫폼은 가짜 부동산 중개 시뮬레이터이므로 계약 행위가 제한됩니다.</p>
+                        <p class="text-[11px] text-gray-500 mt-2 font-normal">이 플랫폼은 가짜 부동산 중개 중개 시뮬레이터이므로 계약 서명이 차단됩니다.</p>
                     `;
                     cfBtn.disabled = false; cfBtn.classList.remove('opacity-40'); cfBtn.onclick = closeModal;
                 }
@@ -791,7 +829,7 @@
         }, 1200);
     }
 
-    // 부동산 형태 카테고리 추가/수정/삭제 로직
+    // 부동산 형태 카테고리 기법 제어
     function addTypeCategory() {
         const newType = prompt("새로운 부동산 형태 카테고리를 명명하세요:");
         if(newType && newType.trim() !== "") {
