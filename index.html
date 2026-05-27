@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>가방 - Fake Room</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;700&display=swap');
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8f9fa; }
+        .gabang-orange { background-color: #ff6e12; } 
+        .gabang-text-orange { color: #ff6e12; }
+        .gabang-border-orange { border-color: #ff6e12; }
+        .hidden { display: none; }
+        .drag-over { background-color: #fff3e0 !important; border: 2px dashed #ff6e12 !important; }
+    </style>
+</head>
+<body class="pb-24">
+
+<header class="gabang-orange text-white p-4 sticky top-0 z-50 shadow-md">
+    <div class="max-w-4xl mx-auto flex flex-col gap-3">
+        <div class="flex justify-between items-center">
+            <div onclick="showSection('home-section')" class="text-2xl font-black cursor-pointer tracking-tighter flex items-center gap-1">
+                🎒 가방 <span class="text-xs font-normal opacity-80">(Fake Room)</span>
+            </div>
+            <div class="flex gap-4 items-center">
+                <button onclick="showSection('bookmark-section')" class="relative text-sm font-bold bg-white text-[#ff6e12] px-3 py-1.5 rounded-full shadow-sm">
+                    ⭐ 보관함 <span id="bookmark-count" class="bg-red-500 text-white text-[10px] rounded-full px-1.5 ml-0.5">0</span>
+                </button>
+            </div>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+            <input type="text" id="region-search-input" placeholder="📍 지역, 지하철역 검색" class="col-span-1 p-2.5 rounded-lg text-black focus:outline-none text-xs shadow-inner bg-orange-50">
+            <div class="col-span-2 relative">
+                <input type="text" id="general-search-input" onkeyup="if(event.key === 'Enter') executeSearch()" placeholder="아파트, 빌라, 원룸 방 번호나 특징 검색" class="w-full p-2.5 rounded-lg text-black focus:outline-none text-xs shadow-inner">
+                <button onclick="executeSearch()" class="absolute right-3 top-2.5 text-gray-400">🔍</button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="max-w-4xl mx-auto p-4">
+    
+    <section id="home-section">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-black text-gray-800 flex items-center gap-1">🔥 오늘의 추천 매물</h2>
+            <button onclick="showAddRoomModal()" class="gabang-orange text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow">+ 신규 매물 등록</button>
+        </div>
+        <div id="recommended-rooms-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            </div>
+    </section>
+
+    <section id="region-section" class="hidden">
+        <div class="bg-white p-4 rounded-xl shadow-sm border mb-4">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-base font-bold text-gray-800">📍 지역 카테고리 관리</h2>
+                <div class="flex gap-1">
+                    <button onclick="addCategory('regions')" class="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold shadow-sm">➕ 추가</button>
+                    <button onclick="showEditCategoryModal('regions')" class="bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold shadow-sm">✏️ 수정</button>
+                    <button onclick="showDeleteCategoryModal('regions')" class="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold shadow-sm">❌ 삭제</button>
+                </div>
+            </div>
+            <div id="region-tags-container" class="flex flex-wrap gap-2"></div>
+        </div>
+        <div id="region-rooms-container" class="grid gap-4 mt-4"></div>
+    </section>
+
+    <section id="type-section" class="hidden">
+        <div class="bg-white p-4 rounded-xl shadow-sm border mb-4">
+            <div class="flex justify-between items-center mb-3">
+                <h2 class="text-base font-bold text-gray-800">🏢 부동산 형태 카테고리 관리</h2>
+                <div class="flex gap-1">
+                    <button onclick="addCategory('types')" class="bg-amber-500 text-white px-2 py-1 rounded text-xs font-bold shadow-sm">➕ 추가</button>
+                    <button onclick="showEditCategoryModal('types')" class="bg-blue-500 text-white px-2 py-1 rounded text-xs font-bold shadow-sm">✏️ 수정</button>
+                    <button onclick="showDeleteCategoryModal('types')" class="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold shadow-sm">❌ 삭제</button>
+                </div>
+            </div>
+            <div id="type-tags-container" class="flex flex-wrap gap-2"></div>
+        </div>
+        <div id="type-rooms-container" class="grid gap-4 mt-4"></div>
+    </section>
+
+    <section id="search-section" class="hidden">
+        <div class="border-b pb-2 mb-4 flex justify-between items-center">
+            <h2 class="text-xl font-black text-gray-800">🔍 매물 검색 결과</h2>
+            <span id="search-count" class="text-sm font-bold text-gray-400">0개의 매물</span>
+        </div>
+        <div id="search-rooms-container" class="grid gap-4"></div>
+    </section>
+
+    <section id="bookmark-section" class="hidden">
+        <h2 class="text-xl font-black text-gray-800 mb-4">⭐ 내가 찜한 보관함 매물</h2>
+        <div id="bookmark-rooms-container" class="grid gap-4"></div>
+    </section>
+
+    <section id="room-detail-section" class="hidden">
+        <div id="room-detail-content" class="bg-white rounded-xl shadow-md overflow-hidden border">
+            </div>
+    </section>
+</main>
+
+<nav class="fixed bottom-0 inset-x-0 bg-white border-t shadow-lg z-50">
+    <div class="max-w-4xl mx-auto grid grid-cols-5 text-center text-xs font-bold text-gray-500">
+        <button onclick="showSection('home-section')" id="nav-home-section" class="py-3 flex flex-col items-center gap-1 gabang-text-orange">
+            <span class="text-lg">🏠</span>홈
+        </button>
+        <button onclick="clickRegionNav()" id="nav-region-section" class="py-3 flex flex-col items-center gap-1 hover:text-[#ff6e12]">
+            <span class="text-lg">📍</span>지역별
+        </button>
+        <button onclick="clickTypeNav()" id="nav-type-section" class="py-3 flex flex-col items-center gap-1 hover:text-[#ff6e12]">
+            <span class="text-lg">🏢</span>방 형태별
+        </button>
+        <button onclick="showSection('search-section')" id="nav-search-section" class="py-3 flex flex-col items-center gap-1 hover:text-[#ff6e12]">
+            <span class="text-lg">🔍</span>상세검색
+        </button>
+        <button onclick="showSection('bookmark-section')" id="nav-bookmark-section" class="py-3 flex flex-col items-center gap-1 hover:text-[#ff6e12]">
+            <span class="text-lg">⭐</span>보관함
+        </button>
+    </div>
+</nav>
+
+<div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-[100]">
+    <div class="bg-white w-full max-w-md p-6 rounded-xl shadow-2xl">
+        <h3 id="modal-title" class="text-lg font-bold mb-4 text-gray-800">정보 입력</h3>
+        <div id="modal-content" class="flex flex-col gap-3 max-h-[60vh] overflow-y-auto"></div>
+        <div class="flex gap-2 mt-6">
+            <button onclick="closeModal()" class="flex-1 py-2 bg-gray-200 rounded font-bold text-sm text-gray-600">취소</button>
+            <button id="modal-confirm-btn" class="flex-1 py-2 gabang-orange text-white rounded font-bold text-sm">확인</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 초기 더미 카테고리 정의
+    let db = JSON.parse(localStorage.getItem('gabangDB_v1')) || {
+        regions: ["강남구", "마포구", "영등포구", "부산 해운대구"],
+        types: ["원룸", "투룸", "오피스텔", "아파트"],
+        bookmarks: [],
+        rooms: [
+            {
+                id: 1,
+                title: "오픈형 가성비 최고 역세권 원룸",
+                region: "마포구",
+                type: "원룸",
+                priceType: "월세",
+                deposit: 500,
+                rent: 45,
+                desc: "풀옵션에 채광 아주 좋습니다. 즉시 입주 가능합니다.",
+                img: "",
+                spec: "방 1개 / 욕실 1개 / 23㎡"
+            },
+            {
+                id: 2,
+                title: "한강뷰 최고급 하이엔드 아파트",
+                region: "강남구",
+                type: "아파트",
+                priceType: "전세",
+                deposit: 85000,
+                rent: 0,
+                desc: "보증금 조절 불가, 최고급 인테리어 및 컨시어지 서비스 제공",
+                img: "",
+                spec: "방 3개 / 욕실 2개 / 112㎡"
+            }
+        ]
+    };
+
+    let selectedRegionFilter = "all";
+    let selectedTypeFilter = "all";
+
+    function init() {
+        renderHomeRooms();
+        updateBookmarkCount();
+    }
+
+    // 드래그 앤 드롭 파일 제어 아키텍처
+    function handleImageDrop(e, inputId) {
+        e.preventDefault();
+        e.currentTarget.classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                document.getElementById(inputId).value = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+    function onDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+    function onDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+
+    function saveDB() { localStorage.setItem('gabangDB_v1', JSON.stringify(db)); }
+
+    // 섹션 전환 라우터 구조
+    function showSection(id) {
+        document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+        
+        // 내비게이션 바 하이라이트 제어
+        document.querySelectorAll('nav button').forEach(b => b.classList.remove('gabang-text-orange'));
+        const activeNav = document.getElementById('nav-' + id);
+        if (activeNav) activeNav.classList.add('gabang-text-orange');
+
+        window.scrollTo(0, 0);
+
+        if (id === 'home-section') renderHomeRooms();
+        if (id === 'bookmark-section') renderBookmarkRooms();
+        if (id === 'region-section') renderRegionTabs();
+        if (id === 'type-section') renderTypeTabs();
+    }
+
+    function clickRegionNav() {
+        selectedRegionFilter = db.regions[0] || "all";
+        showSection('region-section');
+    }
+
+    function clickTypeNav() {
+        selectedTypeFilter = db.types[0] || "all";
+        showSection('type-section');
+    }
+
+    // 홈 화면 추천 매물 렌더링
+    function renderHomeRooms() {
+        const container = document.getElementById('recommended-rooms-container');
+        container.innerHTML = "";
+        if (db.rooms.length === 0) {
+            container.innerHTML = `<div class='col-span-full text-center py-12 text-gray-400 font-bold'>등록된 매물이 존재하지 않습니다. 첫 매물을 등록해 보세요!</div>`;
+            return;
+        }
+        db.rooms.forEach(room => {
+            container.appendChild(createRoomCard(room, true));
+        });
+    }
+
+    // 지역별 탭 및 리스트 렌더링
+    function renderRegionTabs() {
+        const tagBox = document.getElementById('region-tags-container');
+        tagBox.innerHTML = "";
+        
+        db.regions.forEach(reg => {
+            const btn = document.createElement('button');
+            btn.className = `px-3 py-1.5 rounded-full text-xs font-bold transition-all ${selectedRegionFilter === reg ? 'gabang-orange text-white shadow-sm' : 'bg-gray-100 text-gray-600'}`;
+            btn.innerText = `📍 ${reg}`;
+            btn.onclick = () => { selectedRegionFilter = reg; renderRegionTabs(); };
+            tagBox.appendChild(btn);
+        });
+
+        const listContainer = document.getElementById('region-rooms-container');
+        listContainer.innerHTML = "";
+        const filtered = db.rooms.filter(r => r.region === selectedRegionFilter);
+        
+        if(filtered.length === 0) {
+            listContainer.innerHTML = `<div class='text-center py-10 bg-white border border-dashed rounded-xl text-gray-400 text-xs font-bold'>[${selectedRegionFilter}] 지역에 등록된 매물이 없습니다.</div>`;
+        } else {
+            filtered.forEach(room => listContainer.appendChild(createRoomCard(room, false)));
+        }
+    }
+
+    // 방 형태별 탭 및 리스트 렌더링
+    function renderTypeTabs() {
+        const tagBox = document.getElementById('type-tags-container');
+        tagBox.innerHTML = "";
+
+        db.types.forEach(t => {
+            const btn = document.createElement('button');
+            btn.className = `px-3 py-1.5 rounded-full text-xs font-bold transition-all ${selectedTypeFilter === t ? 'gabang-orange text-white shadow-sm' : 'bg-gray-100 text-gray-600'}`;
+            btn.innerText = `🏢 ${t}`;
+            btn.onclick = () => { selectedTypeFilter = t; renderTypeTabs(); };
+            tagBox.appendChild(btn);
+        });
+
+        const listContainer = document.getElementById('type-rooms-container');
+        listContainer.innerHTML = "";
+        const filtered = db.rooms.filter(r => r.type === selectedTypeFilter);
+
+        if(filtered.length === 0) {
+            listContainer.innerHTML = `<div class='text-center py-10 bg-white border border-dashed rounded-xl text-gray-400 text-xs font-bold'>[${selectedTypeFilter}] 형태에 등록된 매물이 없습니다.</div>`;
+        } else {
+            filtered.forEach(room => listContainer.appendChild(createRoomCard(room, false)));
+        }
+    }
+
+    // 보관함 렌더링
+    function renderBookmarkRooms() {
+        const container = document.getElementById('bookmark-rooms-container');
+        container.innerHTML = "";
+        const bookmarked = db.rooms.filter(r => db.bookmarks.includes(r.id));
+
+        if(bookmarked.length === 0) {
+            container.innerHTML = "<div class='text-center py-12 bg-white border rounded-xl text-gray-400 font-bold text-sm'>보관함에 담긴 매물이 없습니다. 마음에 드는 방을 찜해보세요!</div>";
+        } else {
+            bookmarked.forEach(room => container.appendChild(createRoomCard(room, false)));
+        }
+    }
+
+    // 이원화 검색 핵심 기능 통합 구현
+    function executeSearch() {
+        const regQuery = document.getElementById('region-search-input').value.trim();
+        const genQuery = document.getElementById('general-search-input').value.trim();
+
+        showSection('search-section');
+        const container = document.getElementById('search-rooms-container');
+        container.innerHTML = "";
+
+        let results = db.rooms;
+
+        if (regQuery) {
+            results = results.filter(r => r.region.includes(regQuery));
+        }
+        if (genQuery) {
+            results = results.filter(r => r.title.includes(genQuery) || r.desc.includes(genQuery) || r.type.includes(genQuery));
+        }
+
+        document.getElementById('search-count').innerText = `${results.length}개의 매물`;
+
+        if (results.length === 0) {
+            container.innerHTML = "<div class='text-center py-12 text-gray-400 font-bold'>조건에 부합하는 매물 검색 결과가 없습니다.</div>";
+        } else {
+            results.forEach(room => container.appendChild(createRoomCard(room, false)));
+        }
+    }
+
+    // 매물 전용 공용 컴포넌트 카드 컴파일 빌더
+    function createRoomCard(room, gridMode) {
+        const div = document.createElement('div');
+        div.className = `bg-white border rounded-xl shadow-sm overflow-hidden flex flex-col cursor-pointer hover:shadow-md transition-shadow relative`;
+        
+        const imgHtml = room.img 
+            ? `<img src="${room.img}" class="w-full h-44 object-cover">`
+            : `<div class="w-full h-44 bg-gray-100 flex flex-col items-center justify-center text-gray-400 text-xs">🏠 등록된 이미지 없음</div>`;
+
+        const priceText = room.priceType === "월세" 
+            ? `<span class="text-orange-500">월세</span> ${room.deposit}/${room.rent}`
+            : `<span class="text-blue-500">전세</span> ${room.deposit}`;
+
+        const isFav = db.bookmarks.includes(room.id);
+
+        div.innerHTML = `
+            <div onclick="showRoomDetail(${room.id})">
+                ${imgHtml}
+                <div class="p-4">
+                    <p class="text-lg font-black text-gray-900 mb-1">${priceText}</p>
+                    <p class="text-xs font-bold text-gray-400 mb-1">${room.type} · ${room.region}</p>
+                    <h3 class="text-sm font-bold text-gray-700 truncate">${room.title}</h3>
+                    <p class="text-xs text-gray-400 mt-1 truncate">${room.desc}</p>
+                </div>
+            </div>
+            <div class="absolute top-2 right-2 flex gap-1 z-10">
+                <button onclick="toggleBookmark(event, ${room.id})" class="bg-white/90 p-1.5 rounded-full shadow-sm text-sm hover:scale-110 transition-transform">
+                    ${isFav ? '⭐' : '☆'}
+                </button>
+                <button onclick="showEditRoomModal(event, ${room.id})" class="bg-white/95 text-blue-500 font-bold text-[10px] px-2 py-1 rounded shadow-sm hover:bg-blue-50">수정</button>
+                <button onclick="deleteRoom(event, ${room.id})" class="bg-white/95 text-red-500 font-bold text-[10px] px-2 py-1 rounded shadow-sm hover:bg-red-50">삭제</button>
+            </div>
+        `;
+        return div;
+    }
+
+    // 북마크 상태 스위칭 토글러
+    function toggleBookmark(e, id) {
+        e.stopPropagation();
+        const index = db.bookmarks.indexOf(id);
+        if (index > -1) {
+            db.bookmarks.splice(index, 1);
+        } else {
+            db.bookmarks.push(id);
+        }
+        saveDB();
+        updateBookmarkCount();
+        // 현재 활성화 중인 화면 자동 새로고침 처리
+        const activeSection = document.querySelector('main > section:not(.hidden)').id;
+        showSection(activeSection);
+    }
+
+    function updateBookmarkCount() {
+        document.getElementById('bookmark-count').innerText = db.bookmarks.length;
+    }
+
+    // 매물 추가 모달 엔진 제어
+    function showAddRoomModal() {
+        let regionOptions = db.regions.map(r => `<option value="${r}">${r}</option>`).join('');
+        let typeOptions = db.types.map(t => `<option value="${t}">${t}</option>`).join('');
+
+        openModal("🏠 신규 가짜 매물 등록", `
+            <p class="text-[10px] text-orange-500 font-bold mb-1">* 파일탐색기에서 이미지를 드래그하여 입력창에 드롭하면 자동 base64 인코딩 업로드됩니다.</p>
+            <input id="add-title" type="text" placeholder="매물 제목 (예: 채광 좋은 풀옵션 원룸)" class="w-full border p-2.5 rounded text-xs mb-1">
+            <div class="grid grid-cols-2 gap-2 mb-1">
+                <div>
+                    <label class="text-[10px] font-bold text-gray-500">지역 지정</label>
+                    <select id="add-region" class="w-full border p-2 rounded text-xs bg-white">${regionOptions}</select>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-500">방 형태 유형</label>
+                    <select id="add-type" class="w-full border p-2 rounded text-xs bg-white">${typeOptions}</select>
+                </div>
+            </div>
+            <div class="grid grid-cols-3 gap-2 mb-1">
+                <div>
+                    <label class="text-[10px] font-bold text-gray-500">거래 종류</label>
+                    <select id="add-priceType" class="w-full border p-2 rounded text-xs bg-white">
+                        <option value="월세">월세</option>
+                        <option value="전세">전세</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-500">보증금 (만원)</label>
+                    <input id="add-deposit" type="number" placeholder="예: 500" class="w-full border p-2 rounded text-xs">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-500">월세 (만원)</label>
+                    <input id="add-rent" type="number" placeholder="전세면 0" class="w-full border p-2 rounded text-xs">
+                </div>
+            </div>
+            <input id="add-spec" type="text" placeholder="구조 및 크기 (예: 방 1개 / 23㎡)" class="w-full border p-2.5 rounded text-xs mb-1">
+            <textarea id="add-desc" placeholder="상세 매물 정보 설명 기술" class="w-full border p-2.5 rounded text-xs h-16 resize-none mb-1"></textarea>
+            <input id="add-img" type="text" placeholder="이미지 URL 주소 입력 또는 이미지 파일 드래그앤드롭 드롭하기" 
+                class="w-full border p-2.5 rounded text-xs bg-gray-50 focus:bg-white transition-colors"
+                ondrop="handleImageDrop(event, 'add-img')" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)">
+        `, () => {
+            const title = document.getElementById('add-title').value.trim();
+            const region = document.getElementById('add-region').value;
+            const type = document.getElementById('add-type').value;
+            const priceType = document.getElementById('add-priceType').value;
+            const deposit = parseInt(document.getElementById('add-deposit').value) || 0;
+            const rent = parseInt(document.getElementById('add-rent').value) || 0;
+            const spec = document.getElementById('add-spec').value.trim();
+            const desc = document.getElementById('add-desc').value.trim();
+            const img = document.getElementById('add-img').value;
+
+            if(!title) return alert("매물 제목을 명시해주세요.");
+
+            db.rooms.push({
+                id: Date.now(),
+                title, region, type, priceType, deposit, rent, spec, desc, img
+            });
+
+            saveDB();
+            closeModal();
+            showSection('home-section');
+        });
+    }
+
+    // 매물 수정 모달 제어 엔진
+    function showEditRoomModal(e, id) {
+        e.stopPropagation();
+        const room = db.rooms.find(r => r.id === id);
+        
+        let regionOptions = db.regions.map(r => `<option value="${r}" ${room.region === r ? 'selected':''}>${r}</option>`).join('');
+        let typeOptions = db.types.map(t => `<option value="${t}" ${room.type === t ? 'selected':''}>${t}</option>`).join('');
+
+        openModal("✏️ 매물 제원 정보 수정", `
+            <p class="text-[10px] text-blue-500 font-bold mb-1">* 기존 이미지를 유지하거나 새 이미지 파일을 드롭하여 덮어쓰세요.</p>
+            <input id="edit-title" type="text" value="${room.title}" class="w-full border p-2.5 rounded text-xs mb-1">
+            <div class="grid grid-cols-2 gap-2 mb-1">
+                <div>
+                    <label class="text-[10px] font-bold text-gray-500">지역 수정</label>
+                    <select id="edit-region" class="w-full border p-2 rounded text-xs bg-white">${regionOptions}</select>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-500">방 형태 수정</label>
+                    <select id="edit-type" class="w-full border p-2 rounded text-xs bg-white">${typeOptions}</select>
+                </div>
+            </div>
+            <div class="grid grid-cols-3 gap-2 mb-1">
+                <div>
+                    <label class="text-[10px] font-bold text-gray-500">거래 유형</label>
+                    <select id="edit-priceType" class="w-full border p-2 rounded text-xs bg-white">
+                        <option value="월세" ${room.priceType === '월세' ? 'selected':''}>월세</option>
+                        <option value="전세" ${room.priceType === '전세' ? 'selected':''}>전세</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-500">보증금 (만원)</label>
+                    <input id="edit-deposit" type="number" value="${room.deposit}" class="w-full border p-2 rounded text-xs">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-500">월세 (만원)</label>
+                    <input id="edit-rent" type="number" value="${room.rent}" class="w-full border p-2 rounded text-xs">
+                </div>
+            </div>
+            <input id="edit-spec" type="text" value="${room.spec}" class="w-full border p-2.5 rounded text-xs mb-1">
+            <textarea id="edit-desc" class="w-full border p-2.5 rounded text-xs h-16 resize-none mb-1">${room.desc}</textarea>
+            <input id="edit-img" type="text" value="${room.img}" placeholder="새 파일 드래그앤드롭 가능" 
+                class="w-full border p-2.5 rounded text-xs bg-gray-50"
+                ondrop="handleImageDrop(event, 'edit-img')" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)">
+        `, () => {
+            room.title = document.getElementById('edit-title').value.trim();
+            room.region = document.getElementById('edit-region').value;
+            room.type = document.getElementById('edit-type').value;
+            room.priceType = document.getElementById('edit-priceType').value;
+            room.deposit = parseInt(document.getElementById('edit-deposit').value) || 0;
+            room.rent = parseInt(document.getElementById('edit-rent').value) || 0;
+            room.spec = document.getElementById('edit-spec').value.trim();
+            room.desc = document.getElementById('edit-desc').value.trim();
+            room.img = document.getElementById('edit-img').value;
+
+            saveDB();
+            closeModal();
+            const activeSection = document.querySelector('main > section:not(.hidden)').id;
+            showSection(activeSection);
+        });
+    }
+
+    // 매물 데이터 객체 영구 삭제
+    function deleteRoom(e, id) {
+        e.stopPropagation();
+        if(confirm("이 가짜 매물 데이터를 영구히 완전 삭제하시겠습니까?")) {
+            db.rooms = db.rooms.filter(r => r.id !== id);
+            db.bookmarks = db.bookmarks.filter(bId => bId !== id);
+            saveDB();
+            updateBookmarkCount();
+            const activeSection = document.querySelector('main > section:not(.hidden)').id;
+            showSection(activeSection);
+        }
+    }
+
+    // 동적 가상화 기반 매물 상세조회 화면 빌드 (실제 계약 원천 차단 시뮬레이터 연동)
+    function showRoomDetail(id) {
+        showSection('room-detail-section');
+        const room = db.rooms.find(r => r.id === id);
+        const detailBox = document.getElementById('room-detail-content');
+
+        const priceText = room.priceType === "월세" ? `월세 ${room.deposit}/${room.rent}` : `전세 ${room.deposit}`;
+        const imgHtml = room.img ? `<img src="${room.img}" class="w-full h-64 object-cover">` : `<div class="w-full h-48 bg-gray-100 flex items-center justify-center text-gray-400">등록된 매물 사진이 없습니다.</div>`;
+
+        detailBox.innerHTML = `
+            ${imgHtml}
+            <div class="p-6">
+                <span class="bg-orange-100 text-[#ff6e12] text-xs font-bold px-2.5 py-1 rounded-md">${room.type}</span>
+                <h2 class="text-2xl font-black text-gray-950 mt-2 mb-1">${priceText}</h2>
+                <p class="text-sm font-bold text-gray-700 mb-4">📍 ${room.region} · ${room.spec}</p>
+                <div class="border-t border-b py-4 my-4">
+                    <h4 class="text-sm font-bold text-gray-800 mb-2">매물 설명 정보</h4>
+                    <p class="text-xs text-gray-600 leading-relaxed">${room.desc || "상세 기술 명세가 등록되지 않은 매물입니다."}</p>
+                </div>
+                
+                <div class="bg-red-50 p-4 rounded-xl border border-red-200 flex flex-col gap-2">
+                    <p class="text-xs font-bold text-red-600 flex items-center gap-1">⚠️ [계약 주의사항 안내 고지]</p>
+                    <p class="text-[11px] text-gray-500 leading-tight">본 공인중개 정보 중개 플랫폼은 <b>실제 계약 서비스 처리가 제공되지 않는 모의 테스트용 가상 샌드박스 웹사이트</b>입니다. 아래 실시간 비대면 전자계약 체결을 진행하더라도 대금 결제 유도 및 효력이 발생하지 않습니다.</p>
+                    <button onclick="triggerFakeContractSimulation('${room.title}')" class="w-full mt-2 py-3 bg-gray-900 text-white rounded-lg font-black text-xs shadow hover:bg-black transition-colors">📄 실시간 비대면 온라인 안전 전자계약 진행해보기</button>
+                </div>
+            </div>
+        `;
+    }
+
+    // 실제 계약이 불가능함을 시각적 단계 애니메이션으로 보여주는 모의 시뮬레이터 엔진
+    function triggerFakeContractSimulation(roomTitle) {
+        openModal("📄 가상 전자계약 시스템 구동", `
+            <div class="text-center py-4 flex flex-col items-center gap-2">
+                <div id="contract-icon" class="text-4xl animate-bounce">✍️</div>
+                <h4 id="contract-status" class="text-sm font-bold text-gray-800">[${roomTitle}] 계약 원장 승인 검토 중...</h4>
+                <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden mt-3">
+                    <div id="contract-progress" class="bg-orange-500 h-full transition-all duration-700" style="width: 10%"></div>
+                </div>
+            </div>
+        `, null);
+
+        // 확인 버튼 비활성화 (모의 절차 중 강제 락 처리)
+        const cfBtn = document.getElementById('modal-confirm-btn');
+        cfBtn.disabled = true;
+        cfBtn.classList.add('opacity-40');
+
+        const steps = [
+            { p: 40, text: "🔒 국토교통부 가상 네트워크 부동산 전자계약 원장 매핑 중...", icon: "📡" },
+            { p: 70, text: "🔑 위조 방지 가상 블록체인 타임스탬프 전자 서명 날인 검증 중...", icon: "🔐" },
+            { p: 100, text: "❌ 계약 체결 불가능 거부 실패 처리 알림", icon: "⚠️" }
+        ];
+
+        let stepIdx = 0;
+        const interval = setInterval(() => {
+            if(stepIdx < steps.length) {
+                document.getElementById('contract-progress').style.width = steps[stepIdx].p + "%";
+                document.getElementById('contract-status').innerText = steps[stepIdx].text;
+                document.getElementById('contract-icon').innerText = steps[stepIdx].icon;
+                
+                if(stepIdx === steps.length - 1) {
+                    // 마지막 단계에서 거부 사유 경고 출력 인터페이스 렌더링 변경 조치
+                    clearInterval(interval);
+                    document.getElementById('contract-status').innerHTML = `
+                        <span class="text-red-600 font-black text-base">최종 체결 거부 실패</span><br>
+                        <p class="text-[11px] text-gray-500 mt-2 font-normal">이 사이트는 <b>가짜 부동산 중개(Fake Room) 서비스</b>이므로 실제 물리적 계약 매칭을 원천 차단하도록 아키텍처가 구성되어 있습니다.</p>
+                    `;
+                    cfBtn.disabled = false;
+                    cfBtn.classList.remove('opacity-40');
+                    cfBtn.onclick = closeModal;
+                }
+                stepIdx++;
+            }
+        }, 1200);
+    }
+
+    // 카테고리 관리 기능군 아키텍처 세트 (regions / types)
+    function addCategory(dbKey) {
+        const title = dbKey === 'regions' ? '새 행정 구역/지역 카테고리 명칭 추가' : '새 부동산 형태 분류 카테고리 명칭 추가';
+        const newCat = prompt(`${title}명을 입력하세요:`);
+        if(newCat && newCat.trim() !== "") {
+            const cleaned = newCat.trim();
+            if(!db[dbKey].includes(cleaned)) {
+                db[dbKey].push(cleaned);
+                saveDB();
+                showSection(dbKey === 'regions' ? 'region-section' : 'type-section');
+            } else {
+                alert("이미 내역에 명명되어 존재하는 동일 카테고리명 분류입니다.");
+            }
+        }
+    }
+
+    function showEditCategoryModal(dbKey) {
+        if(db[dbKey].length === 0) return alert("수정 대상 분류 데이터 항목이 비어있습니다.");
+        let optionsHtml = db[dbKey].map((c, i) => `<option value="${i}">${c}</option>`).join('');
+
+        openModal("⚙️ 기존 카테고리 명칭 수정 관리", `
+            <label class="text-[10px] text-gray-400 font-bold">수정 대상 식별 선택</label>
+            <select id="edit-cat-idx" class="w-full border p-2.5 rounded text-xs bg-white mb-2">${optionsHtml}</select>
+            <input id="edit-cat-name" type="text" placeholder="새로운 교체 명칭 입력 직접 지정" class="w-full border p-2.5 rounded text-xs">
+        `, () => {
+            const idx = parseInt(document.getElementById('edit-cat-idx').value);
+            const newName = document.getElementById('edit-cat-name').value.trim();
+            if(!newName) return alert("공백 명칭 변경 처리는 불가능합니다.");
+
+            const oldName = db[dbKey][idx];
+            
+            // 기존 등록 매물의 카테고리 식별 메타데이터도 연동 일괄 마이그레이션 교체
+            db.rooms.forEach(r => {
+                if(dbKey === 'regions' && r.region === oldName) r.region = newName;
+                if(dbKey === 'types' && r.type === oldName) r.type = newName;
+            });
+
+            db[dbKey][idx] = newName;
+            if(dbKey === 'regions') selectedRegionFilter = newName;
+            if(dbKey === 'types') selectedTypeFilter = newName;
+
+            saveDB();
+            closeModal();
+            showSection(dbKey === 'regions' ? 'region-section' : 'type-section');
+        });
+    }
+
+    function showDeleteCategoryModal(dbKey) {
+        if(db[dbKey].length === 0) return alert("삭제 처리할 분류 대상 데이터가 없습니다.");
+        let optionsHtml = db[dbKey].map((c, i) => `<option value="${i}">${c}</option>`).join('');
+
+        openModal("❌ 카테고리 분류 삭제", `
+            <p class="text-[10px] text-red-500 font-bold mb-2">* 해당 분류가 제거되면 기 등록 할당 소속 매물들의 연동 필터도 미분류 널(Null)값 처리 유실될 수 있습니다.</p>
+            <select id="delete-cat-idx" class="w-full border p-2.5 rounded text-xs bg-white">${optionsHtml}</select>
+        `, () => {
+            const idx = parseInt(document.getElementById('delete-cat-idx').value);
+            const targetName = db[dbKey][idx];
+
+            if(confirm(`[${targetName}] 카테고리를 삭제하시겠습니까?`)) {
+                db[dbKey].splice(idx, 1);
+                
+                // 잔여 데이터 바인딩 오류 방지를 위해 필터값 안전 인덱스 롤백 재지정
+                if(dbKey === 'regions') selectedRegionFilter = db.regions[0] || "all";
+                if(dbKey === 'types') selectedTypeFilter = db.types[0] || "all";
+                
+                saveDB();
+            }
+            closeModal();
+            showSection(dbKey === 'regions' ? 'region-section' : 'type-section');
+        });
+    }
+
+    // 모달창 범용 트리거 유틸 함수 인프라
+    function openModal(title, content, onConfirm) {
+        document.getElementById('modal-title').innerText = title;
+        document.getElementById('modal-content').innerHTML = content;
+        
+        const confirmBtn = document.getElementById('modal-confirm-btn');
+        confirmBtn.disabled = false;
+        confirmBtn.classList.remove('opacity-40');
+        
+        if (onConfirm) {
+            confirmBtn.onclick = onConfirm;
+            confirmBtn.classList.remove('hidden');
+        } else {
+            confirmBtn.classList.add('hidden'); // 콜백 없을 시 단순 뷰어 모달 용도 처리
+        }
+        document.getElementById('modal').classList.remove('hidden');
+    }
+    
+    function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+
+    // 앱 부팅 진입점 초기화 기동
+    init();
+</script>
+</body>
+</html>
